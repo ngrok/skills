@@ -1,0 +1,12 @@
+{
+  "name": "skills",
+  "description": "ngrok Agent Skills collection: expose localhost, secure endpoints, receive webhooks, and more.",
+  "version": "1.0.0",
+  "author": {
+    "name": "ngrok",
+    "url": "https://github.com/ngrok/skills"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/ngrok/skills",
+  "homepage": "https://github.com/ngrok/skills"
+}
