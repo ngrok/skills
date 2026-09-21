@@ -21,6 +21,8 @@ That's it. This installs to any [Agent Skills](https://agentskills.io/)-compatib
 /plugin install skills@ngrok-skills
 ```
 
+**Cursor users** can alternatively install this as a plugin: **Customize → Plugins → Add marketplace → From GitHub Repository**, then paste `ngrok/skills`.
+
 ## What It Does
 
 This repo gives AI agents task-specific guidance for ngrok: when to expose a local service, when to lock one down, how to receive webhooks safely, and how to tell an ngrok problem from an application problem. Each skill is self-contained instructions plus, where useful, reference material the agent pulls in on demand.
@@ -77,6 +79,9 @@ skills/
 ├── .claude-plugin/
 │   ├── plugin.json          # Claude Code plugin manifest
 │   └── marketplace.json     # Marketplace listing for `/plugin marketplace add`
+├── .cursor-plugin/
+│   ├── plugin.json          # Cursor plugin manifest
+│   └── marketplace.json     # Marketplace listing for Cursor's "From GitHub Repository"
 ├── skills/
 │   ├── expose-localhost/
 │   │   ├── SKILL.md
