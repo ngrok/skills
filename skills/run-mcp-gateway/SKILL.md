@@ -1,5 +1,5 @@
 ---
-name: test-mcp-server
+name: run-mcp-gateway
 description: Expose an in-development MCP (Model Context Protocol) server for remote testing against AI model providers like Claude and OpenAI, with per-provider authentication and traffic inspection. Puts a cloud endpoint in front of your local MCP server, authenticates each provider with its own bearer token via Vaults, and forwards to your server kept off the public internet. Use when the user is building or testing an MCP server and needs a remote AI client to reach it. Use when the user says "test my MCP server", "expose my MCP server to Claude", "connect my MCP server to OpenAI", or "front door for my MCP server".
 license: MIT
 metadata:
@@ -10,9 +10,9 @@ metadata:
 compatibility: Requires a locally running MCP server, the ngrok CLI authenticated with an agent authtoken, and an ngrok API key (the cloud endpoint and Vault secrets are created via `ngrok api`).
 ---
 
-# Test an in-development MCP server
+# Run an MCP gateway
 
-Give a locally running MCP server a public, authenticated URL so remote AI providers (Claude, OpenAI, others) can connect to it while you develop - with each provider on its own token and your server never publicly exposed.
+Expose an in-development MCP (Model Context Protocol) server for remote testing against multiple AI model providers at once, with per-provider authentication and traffic inspection.
 
 ## Before you start
 
@@ -33,7 +33,7 @@ Cloud endpoint (not agent) is required here: providers connect on their own sche
 1. **Give your MCP server an HTTP transport.** MCP dev servers are usually stdio; providers need streamable HTTP. Drop in `references/http-transport.ts` and call it alongside your existing stdio path:
 
    ```ts
-   await runHttp(buildServer, port);        // POST /mcp, bound to 127.0.0.1
+   await runHttp(buildServer, port); // POST /mcp, bound to 127.0.0.1
    ```
 
    It needs `express` and `@modelcontextprotocol/sdk`. It binds loopback by default, so the process is reachable only through the local ngrok agent - pass `{ host }` to change that. stdio keeps working for local clients.
@@ -43,6 +43,7 @@ Cloud endpoint (not agent) is required here: providers connect on their own sche
    The `--host-header=rewrite` matters: traffic arriving via `forward-internal` carries `Host: mcp.internal`, which the MCP SDK's DNS-rebinding protection rejects by default.
 
 3. **Create a vault + one secret per provider.** These are tokens you generate (not the provider's API key), so you can tell providers apart:
+
    ```bash
    ngrok api vaults create --name "mcp-callers"
    ngrok api secrets create --name "claude-key" --value "$(openssl rand -hex 32)" --vault-id "$VAULT_ID"

@@ -296,7 +296,7 @@ skills — hand off rather than reimplementing them here:
   Step 2.)
 - **It should receive webhooks** — `receive-webhooks` verifies provider signatures
   at the edge and can keep the receiver off the public internet.
-- **It is an MCP server** — `test-mcp-server` handles per-provider credentials.
+- **It is an MCP server** — `run-mcp-gateway` handles per-provider credentials.
 - **One endpoint per sandbox, tenant, or device, created by a controlplane** —
   `provision-sandbox-access`.
 - **Something is broken** (`ERR_NGROK_*`, a 400 through the URL but not on
