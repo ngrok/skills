@@ -18,7 +18,7 @@ Source of truth: <https://ngrok.com/docs/gateway/endpoints/>
 - Must stay up when no agent is running, or an external system connects to it on its own (webhook providers, MCP clients, partners) -> **cloud endpoint** as the public front door.
 - The receiver must not be publicly reachable (private service, firewall, compliance) -> run it as an **internal endpoint** and put an agent or cloud endpoint in front that forwards to it.
 
-Common composed shape (used by receive-webhooks, test-mcp-server, and provision-sandbox-access): **cloud endpoint (public, runs the policy) -> forward-internal -> internal endpoint -> local service.**
+Common composed shape (used by receive-webhooks, run-mcp-gateway, and provision-sandbox-access): **cloud endpoint (public, runs the policy) -> forward-internal -> internal endpoint -> local service.**
 
 One more axis, orthogonal to the three types: whether the workload set is known ahead of time. If every environment, tenant, or device needs its *own* endpoint and they are created at runtime, the choice above is still cloud-plus-internal - but the provisioning is programmatic. See `provision-sandbox-access`.
 

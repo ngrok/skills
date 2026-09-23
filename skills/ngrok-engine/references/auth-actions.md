@@ -70,7 +70,7 @@ test compares strings exactly, so it can match a bare address but never a CIDR
         allow: ['203.0.113.4/32', '198.51.100.0/24']
 ```
 
-## Bearer-token gate (used by test-mcp-server)
+## Bearer-token gate (used by run-mcp-gateway)
 
 Per-caller bearer tokens matched against Vault secrets, tagging which caller passed:
 
@@ -96,4 +96,4 @@ on_http_request:
 ```
 
 The canonical multi-provider version of this policy is
-`test-mcp-server/references/traffic-policy.yaml` - use it rather than re-deriving.
+`run-mcp-gateway/references/traffic-policy.yaml` - use it rather than re-deriving.
