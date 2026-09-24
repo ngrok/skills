@@ -1,6 +1,6 @@
 # ngrok Agent Skills
 
-A collection of skills for AI coding agents, covering how to expose, secure, and troubleshoot services with ngrok.
+A collection of skills for AI coding agents, covering how to expose local services, route and secure traffic, receive webhooks, and more.
 
 Skills follow the [Agent Skills](https://agentskills.io/) format, so this repo works both as a standalone skill pack and as a Claude Code plugin.
 
@@ -14,18 +14,14 @@ npx skills add ngrok/skills
 
 That's it. This installs to any [Agent Skills](https://agentskills.io/)-compatible agent.
 
-**Claude Code users** can alternatively install this as a plugin, which adds `/skills:*` slash commands:
+**Claude Code users** can alternatively install this as a plugin, which adds `/ngrok:*` slash commands:
 
 ```
 /plugin marketplace add ngrok/skills
-/plugin install skills@ngrok-skills
+/plugin install ngrok@ngrok
 ```
 
 **Cursor users** can alternatively install this as a plugin: **Customize → Plugins → Add marketplace → From GitHub Repository**, then paste `ngrok/skills`.
-
-## What It Does
-
-This repo gives AI agents task-specific guidance for ngrok: when to expose a local service, when to lock one down, how to receive webhooks safely, and how to tell an ngrok problem from an application problem. Each skill is self-contained instructions plus, where useful, reference material the agent pulls in on demand.
 
 ## Skills
 
@@ -69,7 +65,7 @@ Receive Stripe webhooks and deliver them to a service that isn't publicly reacha
 In Claude Code, you can also invoke a skill directly:
 
 ```
-/skills:expose-localhost
+/ngrok:expose-localhost
 ```
 
 ## Architecture

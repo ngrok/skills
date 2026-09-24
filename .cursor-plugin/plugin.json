@@ -1,8 +1,7 @@
 {
-  "name": "skills",
-  "displayName": "ngrok Skills",
-  "description": "ngrok Agent Skills collection: expose localhost, secure endpoints, receive webhooks, and more.",
-  "version": "1.0.0",
+  "name": "ngrok",
+  "displayName": "ngrok",
+  "description": "Expose local services, route and secure traffic, receive webhooks, and more.",
   "author": {
     "name": "ngrok"
   },

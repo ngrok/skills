@@ -1,6 +1,6 @@
 {
-  "name": "ngrok-skills",
-  "description": "Skills for working with ngrok: exposing local services, securing endpoints, receiving webhooks, and troubleshooting.",
+  "name": "ngrok",
+  "description": "Expose local services, route and secure traffic, receive webhooks, and more.",
   "owner": {
     "name": "ngrok",
     "email": "support@ngrok.com",
@@ -8,10 +8,9 @@
   },
   "plugins": [
     {
-      "name": "skills",
+      "name": "ngrok",
       "source": "./",
-      "description": "ngrok Agent Skills collection: expose localhost, secure endpoints, receive webhooks, and more.",
-      "version": "1.0.0"
+      "description": "Expose local services, route and secure traffic, receive webhooks, and more."
     }
   ]
 }
