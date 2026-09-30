@@ -29,8 +29,8 @@ Send an HTTP request to a third-party API and return the response.
 A list of query parameters to append to the URL. Each item is an object with the following structure: Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars.
 
 ```yaml
-  - key: "parameter_name"
-value: "parameter_value"
+- key: "parameter_name"
+  value: "parameter_value"
 ```
 
 ## Result variables

@@ -1,0 +1,64 @@
+name: Drift
+
+# ngrok's docs can change without a commit here, so no PR would catch it. This is
+# the one scheduled workflow. Weekly, it:
+#   - refreshes the action catalog snapshot and opens a PR if anything changed
+#   - checks every docs link, action type, and error code against the live docs
+#     on main, and fails the run if one is broken
+
+on:
+  schedule:
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  action-catalog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Fetch the docs snapshot
+        run: python3 scripts/gen_action_catalog.py fetch
+
+      - name: Render the catalog
+        run: python3 scripts/gen_action_catalog.py render
+
+      - name: Open a PR if anything changed
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          # A PR opened with the default GITHUB_TOKEN does not trigger CI.
+          # Use a GitHub App or fine-grained token so CI runs on the PR.
+          token: ${{ secrets.DRIFT_BOT_TOKEN }}
+          branch: bot/action-catalog
+          delete-branch: true
+          commit-message: regenerate action catalog from docs
+          title: Regenerate Traffic Policy action catalog
+          body: |
+            ngrok's Traffic Policy docs changed. This PR updates the snapshot
+            (`scripts/data/traffic-policy-actions.json`) and the generated files.
+
+            Before merging:
+            - A new action may deserve a mention in `skills/ngrok-engine/SKILL.md`.
+            - A removed or renamed action may still be used by a job skill.
+
+  docs:
+    # Link rot unrelated to actions, such as a moved page or a removed error
+    # code. A failure here means main is out of date with the docs.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+
+      - name: Check docs links, action types, and error codes
+        run: uv run --with pyyaml==6.0.3 scripts/validate.py --docs

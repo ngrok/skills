@@ -1,0 +1,2207 @@
+[
+  {
+    "type": "add-headers",
+    "name": "Add Headers",
+    "description": "Add headers to your incoming requests or outgoing responses.",
+    "phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "categories": [
+      "request-modification",
+      "response-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "headers",
+        "type": "object",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "Map of header key to header value to be added. Minimum `1`, Maximum `10`.",
+        "values": [],
+        "raw": "\n  Map of header key to header value to be added.\n\n  Minimum `1`, Maximum `10`.\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.add_headers.headers_added",
+        "object"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n      - type: \"add-headers\"\n        config:\n          headers:\n            x-client-ip: \"${conn.client_ip}\"\n",
+    "doc_phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "policy_type": "add-headers"
+  },
+  {
+    "type": "basic-auth",
+    "name": "Basic Auth",
+    "description": "Enforce HTTP Basic Auth for your HTTP endpoints.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "security"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "credentials",
+        "type": "array of strings",
+        "required": true,
+        "cel": true,
+        "depth": 0,
+        "desc": "A list of up to 10 allowed `username:password` credential pairs. Password must be at least `8` characters and no more than `128` characters.",
+        "values": [],
+        "raw": "\n  <p>A list of up to 10 allowed <code>username:password</code> credential pairs.</p>\n  <p>Password must be at least <code>8</code> characters and no more than <code>128</code> characters.</p>\n"
+      },
+      {
+        "name": "realm",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "The HTTP realm of the request as per RFC 7235 .",
+        "values": [],
+        "raw": "\n  <p>The HTTP realm of the request as per <a href=\"https://datatracker.ietf.org/doc/html/rfc7235\">RFC 7235</a>.</p>\n"
+      },
+      {
+        "name": "enforce",
+        "type": "bool",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "If `false`, continue to the next action even if basic authentication failed. This is useful for handling fall-through, debugging, and testing purposes.",
+        "values": [],
+        "raw": "\n  If <code>false</code>, continue to the next action even if basic authentication failed.\n\n  This is useful for handling fall-through, debugging, and testing purposes.\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.basic_auth.credentials.presented",
+        "bool"
+      ],
+      [
+        "actions.ngrok.basic_auth.credentials.username",
+        "string"
+      ],
+      [
+        "actions.ngrok.basic_auth.credentials.authorized",
+        "bool"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n      - type: \"basic-auth\"\n        config:\n          realm: \"sample-realm\"\n          credentials:\n            - \"user:password1\"\n            - \"admin:password2\"\n          enforce: true\n      - type: \"custom-response\"\n        config:\n          status_code: 200\n          headers:\n            content-type: \"text/plain\"\n          body: \"Successfully Authenticated!\"\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "basic-auth"
+  },
+  {
+    "type": "circuit-breaker",
+    "name": "Circuit Breaker",
+    "description": "Maintain system reliability by rejecting requests when error rates exceed defined thresholds.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "traffic-control",
+      "request-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "error_threshold",
+        "type": "float",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Threshold percentage of errors that must be met before requests are rejected. Must be a value between `0.0` and `1.0`.",
+        "values": [],
+        "raw": "\n  Threshold percentage of errors that must be met before requests are\n  rejected.\n\n  Must be a value between `0.0` and `1.0`.\n"
+      },
+      {
+        "name": "volume_threshold",
+        "type": "integer",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Number of requests in a rolling window before checking the error threshold. Must be a number between `1` and `2,000,000,000`.",
+        "values": [],
+        "raw": "\n  Number of requests in a rolling window before checking the error\n  threshold.\n\n  Must be a number between `1` and `2,000,000,000`.\n"
+      },
+      {
+        "name": "window_duration",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Number of seconds in the rolling window that metrics are retained for. Must be a value between `1s` and `2m`.",
+        "values": [],
+        "raw": "\n  Number of seconds in the rolling window that metrics are retained for.\n\n  Must be a value between `1s` and `2m`.\n"
+      },
+      {
+        "name": "tripped_duration",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Number of seconds the system waits after rejecting a request before re-evaluating upstream health. Must be a value between `1s` and `2m`.",
+        "values": [],
+        "raw": "\n  Number of seconds the system waits after rejecting a request before\n  re-evaluating upstream health.\n\n  Must be a value between `1s` and `2m`.\n"
+      },
+      {
+        "name": "num_buckets",
+        "type": "integer",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Number of buckets that metrics are divided into within the rolling window. Fixed at `10`.",
+        "values": [],
+        "raw": "\n  Number of buckets that metrics are divided into within the rolling window.\n\n  Fixed at `10`.\n"
+      },
+      {
+        "name": "enforce",
+        "type": "boolean",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Determines if the circuit breaker is active. If `false`, the circuit breaker never trips, and no requests are rejected.",
+        "values": [],
+        "raw": "\n  Determines if the circuit breaker is active.\n\n  If `false`, the circuit breaker never trips, and no requests are rejected.\n"
+      }
+    ],
+    "results": [],
+    "example": "  on_http_request:\n    - actions:\n      - type: \"circuit-breaker\"\n        config:\n          error_threshold: 0\n          volume_threshold: 1\n          window_duration: \"60s\"\n          tripped_duration: \"2m\"\n          enforce: true\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "circuit-breaker"
+  },
+  {
+    "type": "close-connection",
+    "name": "Close Connection",
+    "description": "Close a client's connection to ngrok before it is further processed or tunneled to any of your upstream services.",
+    "phases": [
+      "on_tcp_connect",
+      "on_http_request"
+    ],
+    "categories": [
+      "traffic-control"
+    ],
+    "terminating": true,
+    "config": [],
+    "results": [],
+    "example": "    on_http_request:\n    - name: \"Immediately close connection\"\n      expressions:\n        - req.url.path.startsWith(\"/dc\")\n      actions:\n        - type: close-connection\n",
+    "doc_phases": [
+      "on_http_request",
+      "on_tcp_connect"
+    ],
+    "policy_type": "close-connection"
+  },
+  {
+    "type": "compress-response",
+    "name": "Compress Response",
+    "description": "Compress HTTP response bodies from your upstream server.",
+    "phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "categories": [
+      "response-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "algorithms",
+        "type": "array of strings",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "A list of allowed compression algorithms to be considered during encoding type negotiation. Each element must be unique.",
+        "values": [
+          "`br`",
+          "`compress`",
+          "`deflate`",
+          "`gzip`"
+        ],
+        "raw": "\n  A list of allowed compression algorithms to be considered during encoding\n  type negotiation. Each element must be unique.\n\n  <ConfigEnum label=\"Supported algorithms\">\n     \n     \n     \n     \n  </ConfigEnum>\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.compress.already_compressed",
+        "boolean"
+      ],
+      [
+        "actions.ngrok.compress.negotiated_algorithm",
+        "string"
+      ]
+    ],
+    "example": "  on_http_response:\n    - expressions:\n        - \"req.url.path.startsWith('/api/')\"\n      actions:\n        - type: \"compress-response\"\n          config:\n            algorithms:\n              - \"gzip\"\n              - \"br\"\n              - \"deflate\"\n              - \"compress\"\n",
+    "doc_phases": [
+      "on_http_response"
+    ],
+    "policy_type": "compress-response"
+  },
+  {
+    "type": "custom-response",
+    "name": "Custom Response",
+    "description": "Send a custom HTTP response directly back to the client.",
+    "phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "categories": [
+      "response-modification"
+    ],
+    "terminating": true,
+    "config": [
+      {
+        "name": "status_code",
+        "type": "integer",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Status code of the custom response being sent back.",
+        "values": [],
+        "raw": "\n  <p>Status code of the custom response being sent back.</p>\n"
+      },
+      {
+        "name": "body",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "Body of the custom response being sent back.",
+        "values": [],
+        "raw": "\n  <p>Body of the custom response being sent back.</p>\n"
+      },
+      {
+        "name": "headers",
+        "type": "object",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "Map of key-value headers of the custom response to be sent back. If `content-type` is not included in `headers`, this action will attempt to infer the correct `content-type`. Maximum properties `10`.",
+        "values": [],
+        "raw": "\n  <p>\n    Map of key-value headers of the custom response to be sent back. If\n    `content-type` is not included in `headers`, this action will attempt to\n    infer the correct `content-type`. Maximum properties `10`.\n  </p>\n"
+      }
+    ],
+    "results": [],
+    "example": "  on_http_request:\n    - actions:\n        - type: custom-response\n          config:\n            status_code: 503\n            body: <html><body><h1>Service Unavailable</h1><p>Our servers are currently down for maintenance. Please check back later.</p></body></html>\n            headers:\n              content-type: text/html\n",
+    "doc_phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "policy_type": "custom-response"
+  },
+  {
+    "type": "deny",
+    "name": "Deny",
+    "description": "Deny incoming traffic to your endpoint at the HTTP layer.",
+    "phases": [
+      "on_http_request",
+      "on_tcp_connect"
+    ],
+    "categories": [
+      "traffic-control",
+      "connection-modification"
+    ],
+    "terminating": true,
+    "config": [
+      {
+        "name": "status_code",
+        "type": "integer",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "The response status code to return back to the client when the request is denied.",
+        "values": [],
+        "raw": "\n      The response status code to return back to the client when the request is denied.\n    "
+      }
+    ],
+    "results": [],
+    "example": "      on_tcp_connect:\n        - actions:\n            - type: deny\n",
+    "doc_phases": [
+      "on_tcp_connect",
+      "on_http_request"
+    ],
+    "policy_type": "deny"
+  },
+  {
+    "type": "forward-internal",
+    "name": "Forward Internal",
+    "description": "Forward traffic to an internal endpoint within the same ngrok account.",
+    "phases": [
+      "on_http_request",
+      "on_tcp_connect"
+    ],
+    "categories": [
+      "traffic-control",
+      "connection-modification"
+    ],
+    "terminating": true,
+    "config": [
+      {
+        "name": "url",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 0,
+        "desc": "The endpoint to forward to, such as `http://my-internal-endpoint.internal:1234`.",
+        "values": [],
+        "raw": "\n  <p>\n    The endpoint to forward to, such as <code>[http://my-internal-endpoint.internal:1234](http://my-internal-endpoint.internal:1234)</code>.\n  </p>\n"
+      },
+      {
+        "name": "on_error",
+        "type": "enum",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Whether or not further actions in the Traffic Policy should run if there is an error.",
+        "values": [
+          "`halt` (default)",
+          "`continue`"
+        ],
+        "raw": "\n  <p>\n    Whether or not further actions in the Traffic Policy should run if there\n    is an error.\n  </p>\n\n  <ConfigEnum>\n     \n     \n  </ConfigEnum>\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.forward_internal.url",
+        "string"
+      ],
+      [
+        "actions.ngrok.forward_internal.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.forward_internal.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: forward-internal\n          config:\n            url: https://example.internal\n",
+    "doc_phases": [
+      "on_tcp_connect",
+      "on_http_request"
+    ],
+    "policy_type": "forward-internal"
+  },
+  {
+    "type": "http-request",
+    "name": "HTTP Request",
+    "description": "Send an HTTP request to a third-party API and return the response.",
+    "phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "categories": [
+      "traffic-control",
+      "connection-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "url",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 0,
+        "desc": "The destination URL for the HTTP request.",
+        "values": [],
+        "raw": "\n  The destination URL for the HTTP request.\n"
+      },
+      {
+        "name": "method",
+        "type": "enum",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "The HTTP method to use for the request.",
+        "values": [
+          "`GET` (default)",
+          "`PUT`",
+          "`POST`",
+          "`PATCH`",
+          "`DELETE`",
+          "`OPTIONS`"
+        ],
+        "raw": "\n  The HTTP method to use for the request.\n\n  <ConfigEnum>\n     \n     \n     \n     \n     \n     \n  </ConfigEnum>\n"
+      },
+      {
+        "name": "query_params",
+        "type": "list of objects",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "A list of query parameters to append to the URL. Each item is an object with the following structure: ```yaml theme={null} - key: \"parameter_name\" value: \"parameter_value\" ``` Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars.",
+        "values": [],
+        "raw": "\n  A list of query parameters to append to the URL. Each item is an object with the following structure:\n\n  ```yaml theme={null}\n  - key: \"parameter_name\"\n    value: \"parameter_value\"\n  ```\n\n  Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars.\n"
+      },
+      {
+        "name": "headers",
+        "type": "object",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "A map of HTTP headers to include in the request. Keys are header names and values are header values. Maximum: `10` entries.",
+        "values": [],
+        "raw": "\n  A map of HTTP headers to include in the request. Keys are header names and values are header values.\n\n  Maximum: `10` entries.\n"
+      },
+      {
+        "name": "body",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "The body of the HTTP request. Supported on methods like `POST`, `PUT`, or `PATCH`.",
+        "values": [],
+        "raw": "\n  The body of the HTTP request. Supported on methods like `POST`, `PUT`, or `PATCH`.\n"
+      },
+      {
+        "name": "max_redirects",
+        "type": "int",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "The maximum number of HTTP redirects to follow. The minimum allowed is `0`. The maximum allowed is `100`.",
+        "values": [],
+        "raw": "\n  The maximum number of HTTP redirects to follow.\n\n  The minimum allowed is `0`. The maximum allowed is `100`.\n"
+      },
+      {
+        "name": "timeout",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "The maximum duration as a duration string to wait for the entire request (including retries and redirects). The minimum allowed is `1s`. The maximum allowed is `30s`.",
+        "values": [],
+        "raw": "\n  The maximum duration as a duration string to wait for the entire request (including retries and redirects).\n\n  The minimum allowed is `1s`. The maximum allowed is `30s`.\n"
+      },
+      {
+        "name": "retry_condition",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "A CEL expression evaluated after each failed attempt. If `true`, the request is retried (up to `3` times).",
+        "values": [
+          "`attempts` (`int`): Total number of attempts so far",
+          "`last_attempt.req`: The last request object",
+          "`last_attempt.res`: The last response object (if any)",
+          "`last_attempt.error`: The error string (if any)"
+        ],
+        "raw": "\n  A CEL expression evaluated after each failed attempt. If `true`, the request is retried (up to `3` times).\n\n  <ConfigEnum>\n     \n     \n     \n     \n  </ConfigEnum>\n"
+      },
+      {
+        "name": "on_error",
+        "type": "enum",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Determines how to proceed if the HTTP request fails.",
+        "values": [
+          "`continue` (default) – Proceed with remaining actions",
+          "`halt` – Stop processing the policy"
+        ],
+        "raw": "\n  Determines how to proceed if the HTTP request fails.\n\n  <ConfigEnum>\n     \n     \n  </ConfigEnum>\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.http_request.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.error.message",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.attempts",
+        "array of objects"
+      ],
+      [
+        "actions.ngrok.http_request.attempts[i].resolved_ip",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.attempts[i].response_header",
+        "object"
+      ],
+      [
+        "actions.ngrok.http_request.attempts[i].response_status_code",
+        "int"
+      ],
+      [
+        "actions.ngrok.http_request.attempts[i].response_time_ms",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.req",
+        "object"
+      ],
+      [
+        "actions.ngrok.http_request.req.method",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.req.header",
+        "object"
+      ],
+      [
+        "actions.ngrok.http_request.req.url",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.req.body",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.res",
+        "object"
+      ],
+      [
+        "actions.ngrok.http_request.res.resolved_ip",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.res.header",
+        "object"
+      ],
+      [
+        "actions.ngrok.http_request.res.status_code",
+        "int"
+      ],
+      [
+        "actions.ngrok.http_request.res.time_ms",
+        "string"
+      ],
+      [
+        "actions.ngrok.http_request.res.body",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - name: BasicInternalRequest\n      actions:\n        - type: http-request\n          config:\n            url: https://upstream-service.internal/ping\n",
+    "doc_phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "policy_type": "http-request"
+  },
+  {
+    "type": "jwt-validation",
+    "name": "JWT Validation",
+    "description": "Validate JSON Web Tokens (JWTs) on your incoming requests.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "security"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "issuer",
+        "type": "object",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Configuration object for the Issuer(s) of the JWTs.",
+        "values": [],
+        "raw": "\n  Configuration object for the Issuer(s) of the JWTs.\n\n  <Expandable label=\"child properties\">\n    \n  </Expandable>\n"
+      },
+      {
+        "name": "issuer.allow_list",
+        "type": "array of objects",
+        "required": true,
+        "cel": false,
+        "depth": 1,
+        "desc": "List of allowed issuers. Minimum `1`.",
+        "values": [],
+        "raw": "\n      List of allowed issuers. Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
+      },
+      {
+        "name": "issuer.allow_list[*].value",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 2,
+        "desc": "Issuer URL. This can be found in the `iss` claim after decoding the JWT or from the `/.well-known/openid-configuration` endpoint in your Identity Provider.",
+        "values": [],
+        "raw": "\n          Issuer URL. This can be found in the <code>iss</code> claim after decoding the JWT or from the <code>/.well-known/openid-configuration</code> endpoint in your Identity Provider.\n        "
+      },
+      {
+        "name": "audience",
+        "type": "object",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Configuration object for the Audience(s) of the JWTs.",
+        "values": [],
+        "raw": "\n  Configuration object for the Audience(s) of the JWTs.\n\n  <Expandable label=\"child properties\">\n    \n  </Expandable>\n"
+      },
+      {
+        "name": "audience.allow_list",
+        "type": "array of objects",
+        "required": false,
+        "cel": false,
+        "depth": 1,
+        "desc": "List of allowed audiences. Minimum `1`.",
+        "values": [],
+        "raw": "\n      List of allowed audiences. Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
+      },
+      {
+        "name": "audience.allow_list[*].value",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 2,
+        "desc": "Audience claim value. This can be found in the `aud` claim after decoding the JWT or from the request used to create the token in the first place.",
+        "values": [],
+        "raw": "\n          Audience claim value. This can be found in the <code>aud</code> claim after decoding the JWT or from the request used to create the token in the first place.\n        "
+      },
+      {
+        "name": "http",
+        "type": "object",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Configuration object for the HTTP requests containing JWTs.",
+        "values": [],
+        "raw": "\n  Configuration object for the HTTP requests containing JWTs.\n\n  <Expandable label=\"child properties\">\n    \n  </Expandable>\n"
+      },
+      {
+        "name": "http.tokens",
+        "type": "array of objects",
+        "required": true,
+        "cel": false,
+        "depth": 1,
+        "desc": "List of tokens to validate. Minimum `1`.",
+        "values": [],
+        "raw": "\n      List of tokens to validate. Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
+      },
+      {
+        "name": "http.tokens[*].type",
+        "type": "enum",
+        "required": true,
+        "cel": false,
+        "depth": 2,
+        "desc": "Type of the JWT, which acts as a hint about how ngrok should parse the token.",
+        "values": [
+          "`id_token`",
+          "`access_token`",
+          "`at+jwt`",
+          "`it+jwt`",
+          "`plain`",
+          "`jwt`"
+        ],
+        "raw": "\n          Type of the JWT, which acts as a hint about how ngrok should parse the token.\n\n          <ConfigEnum>\n             \n             \n             \n             \n             \n             \n          </ConfigEnum>\n        "
+      },
+      {
+        "name": "http.tokens[*].method",
+        "type": "enum",
+        "required": true,
+        "cel": false,
+        "depth": 2,
+        "desc": "Location in the request to expect the JWT. When choosing `header`, the `content-type` header must be set to either `application/json` or `application/x-www-form-urlencoded`. When choosing `body`, the method must be `POST`, `PUT`, or `PATCH` Including a token as a URL query parameter is not supported.",
+        "values": [
+          "`header`",
+          "`body`"
+        ],
+        "raw": "\n          Location in the request to expect the JWT.\n\n          <ConfigEnum>\n             \n             \n          </ConfigEnum>\n\n          When choosing `header`, the <code>content-type</code> header must be set to either <code>application/json</code> or <code>application/x-www-form-urlencoded</code>.\n\n          When choosing <code>body</code>, the method must be <code>POST</code>, <code>PUT</code>, or <code>PATCH</code>\n\n          Including a token as a URL query parameter is not supported.\n        "
+      },
+      {
+        "name": "http.tokens[*].name",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 2,
+        "desc": "Name of the header or body field where the JWT is expected (Example: `\"Authorization\"`). This is not case sensitive.",
+        "values": [],
+        "raw": "\n          Name of the header or body field where the JWT is expected (Example: <code>\"Authorization\"</code>). This is not case sensitive.\n        "
+      },
+      {
+        "name": "http.tokens[*].prefix",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 2,
+        "desc": "Any prefix to strip from the header or body field before parsing the JWT (Example: `\"Bearer \"`).",
+        "values": [],
+        "raw": "\n          Any prefix to strip from the header or body field before parsing the JWT (Example: <code>\"Bearer \"</code>).\n        "
+      },
+      {
+        "name": "jws",
+        "type": "object",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Configuration object for signed JWTs (JWS).",
+        "values": [],
+        "raw": "\n  Configuration object for signed JWTs (JWS).\n\n  <Expandable label=\"child properties\">\n    \n  </Expandable>\n"
+      },
+      {
+        "name": "jws.allowed_algorithms",
+        "type": "array of strings",
+        "required": true,
+        "cel": false,
+        "depth": 1,
+        "desc": "List of allowed signing algorithms. The value `none` is not supported here because it is insecure. Minimum `1`.",
+        "values": [],
+        "raw": "\n      List of allowed signing algorithms. The value <code>none</code> is not supported here because it is insecure. Minimum `1`.\n    "
+      },
+      {
+        "name": "jws.keys",
+        "type": "array of objects",
+        "required": true,
+        "cel": false,
+        "depth": 1,
+        "desc": "Configuration for the JWT signing keys.",
+        "values": [],
+        "raw": "\n      Configuration for the JWT signing keys.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
+      },
+      {
+        "name": "jws.keys[*].identification",
+        "type": "array of objects",
+        "required": false,
+        "cel": false,
+        "depth": 2,
+        "desc": "JWT metadata.",
+        "values": [],
+        "raw": "\n          JWT metadata.\n\n          <Expandable label=\"child properties\">\n            \n          </Expandable>\n        "
+      },
+      {
+        "name": "jws.keys[*].identification[*].token_claims",
+        "type": "array of strings",
+        "required": false,
+        "cel": false,
+        "depth": 3,
+        "desc": "List of claims present in this token. Supported values: ['kid']",
+        "values": [],
+        "raw": "\n              List of claims present in this token. Supported values: \\['kid']\n            "
+      },
+      {
+        "name": "jws.keys[*].sources",
+        "type": "array of objects",
+        "required": true,
+        "cel": false,
+        "depth": 2,
+        "desc": "Configuration for the key material used to verify the signed JWTs.",
+        "values": [],
+        "raw": "\n          Configuration for the key material used to verify the signed JWTs.\n\n          <Expandable label=\"child properties\">\n            \n          </Expandable>\n        "
+      },
+      {
+        "name": "jws.keys[*].sources[*].additional_jkus",
+        "type": "array of strings",
+        "required": true,
+        "cel": true,
+        "depth": 3,
+        "desc": "List of URLs which serve the possible signing keys in JWKS format. These URLs are cached and refreshed roughly every 15 minutes.",
+        "values": [],
+        "raw": "\n              List of URLs which serve the possible signing keys in JWKS format. These URLs are cached and refreshed roughly every 15 minutes.\n            "
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.jwt_validation.tokens",
+        "array of objects"
+      ],
+      [
+        "actions.ngrok.jwt_validation.tokens[i].header",
+        "object"
+      ],
+      [
+        "actions.ngrok.jwt_validation.tokens[i].location",
+        "string"
+      ],
+      [
+        "actions.ngrok.jwt_validation.tokens[i].location_property",
+        "string"
+      ],
+      [
+        "actions.ngrok.jwt_validation.tokens[i].payload",
+        "object"
+      ],
+      [
+        "actions.ngrok.jwt_validation.tokens[i].signature",
+        "string"
+      ],
+      [
+        "actions.ngrok.jwt_validation.tokens[i].verified",
+        "boolean"
+      ],
+      [
+        "actions.ngrok.jwt_validation.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.jwt_validation.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: jwt-validation\n          config:\n            issuer:\n              allow_list:\n                - value: https://example.com/issuer\n            audience:\n              allow_list:\n                - value: urn:example:api\n            http:\n              tokens:\n                - type: access_token\n                  method: header\n                  name: Authorization\n                  prefix: 'Bearer '\n                - type: it+jwt\n                  method: body\n                  name: _id_token\n            jws:\n              allowed_algorithms:\n                - RS256\n                - ES256\n              keys:\n                sources:\n                  additional_jkus:\n                    - https://example.com/issuer/jku\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "jwt-validation"
+  },
+  {
+    "type": "log",
+    "name": "Log",
+    "description": "Add log metadata to events for logging and monitoring.",
+    "phases": [
+      "on_http_request",
+      "on_http_response",
+      "on_tcp_connect"
+    ],
+    "categories": [
+      "connection-modification",
+      "response-modification",
+      "request-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "metadata",
+        "type": "map[string]any",
+        "required": true,
+        "cel": true,
+        "depth": 0,
+        "desc": "A key-value map of metadata that you would like to include in your events for this action.",
+        "values": [],
+        "raw": "\n  A key-value map of metadata that you would like to include in your events\n  for this action.\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.log.metadata",
+        "object"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: log\n          config:\n            metadata:\n              message: Log action executed.\n              endpoint_id: ${endpoint.id}\n",
+    "doc_phases": [
+      "on_tcp_connect",
+      "on_http_request",
+      "on_http_response"
+    ],
+    "policy_type": "log"
+  },
+  {
+    "type": "oauth",
+    "name": "OAuth",
+    "description": "Add OAuth login for your HTTP endpoints.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "security"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "provider",
+        "type": "string",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "The name of the *OAuth* identity provider to be used for authentication.",
+        "values": [],
+        "raw": "\n  The name of the *OAuth* identity provider to be used for authentication.\n"
+      },
+      {
+        "name": "auth_id",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Unique authentication identifier for this provider. Used to scope the session cookie and to target this provider in login and logout paths. See Special paths.",
+        "values": [],
+        "raw": "\n  Unique authentication identifier for this provider.\n  Used to scope the session cookie and to target this provider in login and logout paths.\n  See [Special paths](#special-paths).\n"
+      },
+      {
+        "name": "client_id",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "Your OAuth app's client ID. Leave this empty if you want to use ngrok's managed application.",
+        "values": [],
+        "raw": "\n  Your OAuth app's client ID.\n\n  <Note>\n    Leave this empty if you want to use ngrok's managed application.\n  </Note>\n"
+      },
+      {
+        "name": "client_secret",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "Your OAuth app's client secret. Leave this empty if you want to use a managed application.",
+        "values": [],
+        "raw": "\n  Your OAuth app's client secret.\n\n  <Note>\n    Leave this empty if you want to use a managed application.\n  </Note>\n"
+      },
+      {
+        "name": "scopes",
+        "type": "array of strings",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "A list of additional scopes to request when users authenticate with the identity provider.",
+        "values": [],
+        "raw": "\n  A list of additional scopes to request when users authenticate with the identity provider.\n"
+      },
+      {
+        "name": "authz_url_params",
+        "type": "map of string to string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "A map of additional URL parameters to apply to the authorization endpoint URL.",
+        "values": [],
+        "raw": "\n  A map of additional URL parameters to apply to the authorization endpoint URL.\n"
+      },
+      {
+        "name": "max_session_duration",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Defines the maximum lifetime of a session regardless of activity.",
+        "values": [],
+        "raw": "\n  Defines the maximum lifetime of a session regardless of activity.\n"
+      },
+      {
+        "name": "idle_session_timeout",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Defines the period of inactivity after which a user's session is automatically ended, requiring re-authentication.",
+        "values": [],
+        "raw": "\n  Defines the period of inactivity after which a user's session is automatically ended, requiring re-authentication.\n"
+      },
+      {
+        "name": "userinfo_refresh_interval",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "How often should ngrok refresh data about the authenticated user from the identity provider.",
+        "values": [],
+        "raw": "\n  How often should ngrok refresh data about the authenticated user from the identity provider.\n"
+      },
+      {
+        "name": "allow_cors_preflight",
+        "type": "boolean",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Allow CORS preflight requests to bypass authentication checks. Enable this if the endpoint needs to be accessible via CORS.",
+        "values": [],
+        "raw": "\n  Allow CORS preflight requests to bypass authentication checks.\n  Enable this if the endpoint needs to be accessible via CORS.\n"
+      },
+      {
+        "name": "auth_cookie_domain",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Sets the allowed domain for the auth cookie.",
+        "values": [],
+        "raw": "\n  Sets the allowed domain for the auth cookie.\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.oauth.error",
+        "object"
+      ],
+      [
+        "actions.ngrok.oauth.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.error.message",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.identity",
+        "object"
+      ],
+      [
+        "actions.ngrok.oauth.identity.id",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.identity.email",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.identity.name",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.identity.provider_user_id",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.identity.current_provider_session_id",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth",
+        "object"
+      ],
+      [
+        "actions.ngrok.oauth.access_token",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.refresh_token",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.expires_at",
+        "string"
+      ],
+      [
+        "actions.ngrok.oauth.session_timed_out",
+        "boolean"
+      ],
+      [
+        "actions.ngrok.oauth.session_max_duration_reached",
+        "boolean"
+      ],
+      [
+        "actions.ngrok.oauth.userinfo_refreshed",
+        "boolean"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: oauth\n          config:\n            provider: google\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "oauth"
+  },
+  {
+    "type": "oidc",
+    "name": "OpenID Connect (OIDC)",
+    "description": "Add OpenID Connect login for your HTTP endpoints.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "security"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "issuer_url",
+        "type": "string",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "The base URL of the Open ID provider that serves an OpenID Provider Configuration Document at `/.well-known/openid-configuration`.",
+        "values": [],
+        "raw": "\n  The base URL of the Open ID provider that serves an OpenID Provider\n  Configuration Document at `/.well-known/openid-configuration`.\n"
+      },
+      {
+        "name": "auth_id",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Unique authentication identifier for this provider. Used to scope the session cookie and to target this provider in login and logout paths. See Special paths.",
+        "values": [],
+        "raw": "\n  Unique authentication identifier for this provider.\n  Used to scope the session cookie and to target this provider in login and logout paths.\n  See [Special paths](#special-paths).\n"
+      },
+      {
+        "name": "client_id",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "Your OpenID Connect app's client ID.",
+        "values": [],
+        "raw": "\n  Your OpenID Connect app's client ID.\n"
+      },
+      {
+        "name": "client_secret",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "Your OpenID Connect app's client secret.",
+        "values": [],
+        "raw": "\n  Your OpenID Connect app's client secret.\n"
+      },
+      {
+        "name": "scopes",
+        "type": "array of strings",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "A list of additional scopes to request when users authenticate with the identity provider.",
+        "values": [],
+        "raw": "\n  A list of additional scopes to request when users authenticate with the\n  identity provider.\n"
+      },
+      {
+        "name": "authz_url_params",
+        "type": "map of string to string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "A map of additional URL parameters to apply to the authorization endpoint URL.",
+        "values": [],
+        "raw": "\n  A map of additional URL parameters to apply to the authorization endpoint\n  URL.\n"
+      },
+      {
+        "name": "max_session_duration",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Defines the maximum lifetime of a session regardless of activity.",
+        "values": [],
+        "raw": "\n  Defines the maximum lifetime of a session regardless of activity.\n"
+      },
+      {
+        "name": "idle_session_duration",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Defines the period of inactivity after which a user's session is automatically ended, requiring re-authentication.",
+        "values": [],
+        "raw": "\n  Defines the period of inactivity after which a user's session is\n  automatically ended, requiring re-authentication.\n"
+      },
+      {
+        "name": "userinfo_refresh_interval",
+        "type": "duration",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "How often should ngrok refresh data about the authenticated user from the identity provider.",
+        "values": [],
+        "raw": "\n  How often should ngrok refresh data about the authenticated user from the\n  identity provider.\n"
+      },
+      {
+        "name": "allow_cors_preflight",
+        "type": "boolean",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Allow CORS preflight requests to bypass authentication checks. Enable if the endpoint needs to be accessible via CORS.",
+        "values": [],
+        "raw": "\n  Allow CORS preflight requests to bypass authentication checks. Enable if\n  the endpoint needs to be accessible via CORS.\n"
+      },
+      {
+        "name": "auth_cookie_domain",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Sets the allowed domain for the auth cookie.",
+        "values": [],
+        "raw": "\n  Sets the allowed domain for the auth cookie.\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.oidc.error",
+        "object"
+      ],
+      [
+        "actions.ngrok.oidc.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.error.message",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.identity",
+        "object"
+      ],
+      [
+        "actions.ngrok.oidc.identity.id",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.identity.email",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.identity.name",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.identity.provider_user_id",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.identity.current_session_id",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc",
+        "object"
+      ],
+      [
+        "actions.ngrok.oidc.identity_token",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.access_token",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.refresh_token",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.expires_at",
+        "string"
+      ],
+      [
+        "actions.ngrok.oidc.session_timed_out",
+        "boolean"
+      ],
+      [
+        "actions.ngrok.oidc.session_max_duration_reached",
+        "boolean"
+      ],
+      [
+        "actions.ngrok.oidc.user_info_refreshed",
+        "boolean"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: openid-connect\n          config:\n            issuer_url: '{your issuer url}'\n            client_id: '{your app''s oauth client id}'\n            client_secret: '{your app''s oauth client secret}'\n            scopes:\n              - openid\n              - profile\n              - email\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "openid-connect"
+  },
+  {
+    "type": "owasp-crs-request",
+    "name": "OWASP/CRS Request",
+    "description": "Add OWASP CoreRuleSet to incoming HTTP requests to your endpoints.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "security",
+      "traffic-control",
+      "request-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "on_error",
+        "type": "string",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Behavior if there is an error processing rules. Must be one of either `\"continue\"` or `\"halt\"` (default `\"halt\"`). More information can be found in the Managing Fallback Behavior section.",
+        "values": [],
+        "raw": "\n  <p>Behavior if there is an error processing rules. Must be one of either <code>\"continue\"</code> or <code>\"halt\"</code> (default <code>\"halt\"</code>).</p>\n  <p>More information can be found in the [Managing Fallback Behavior](#managing-fallback-behavior-on-error) section.</p>\n"
+      },
+      {
+        "name": "process_body",
+        "type": "bool",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "If `true`, rules for the request body are evaluated. Default is `false`. See Body Processing for details and limitations.",
+        "values": [],
+        "raw": "\n  <p>If <code>true</code>, rules for the request body are evaluated. Default is <code>false</code>.</p>\n  <p>See [Body Processing](#body-processing) for details and limitations.</p>\n"
+      },
+      {
+        "name": "exclude_rule_ids",
+        "type": "array of integers",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "List of OWASP CRS rule IDs to exclude from evaluation. The minimum value is `900000` and the maximum value is `999999`.",
+        "values": [],
+        "raw": "\n  <p>List of OWASP CRS rule IDs to exclude from evaluation.</p>\n  <p>The minimum value is <code>900000</code> and the maximum value is <code>999999</code>.</p>\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.owasp_crs_request.decision",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.anomaly_score",
+        "int"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.anomaly_score_threshold",
+        "int"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.matched_rules",
+        "array of objects"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.matched_rules[i].id",
+        "int"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.matched_rules[i].message",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.matched_rules[i].severity",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.matched_rules[i].data",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_request.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: owasp-crs-request\n          config:\n            on_error: halt\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "owasp-crs-request"
+  },
+  {
+    "type": "owasp-crs-response",
+    "name": "OWASP/CRS Response",
+    "description": "Add OWASP CoreRuleSet to outgoing HTTP responses from your endpoints.",
+    "phases": [
+      "on_http_response"
+    ],
+    "categories": [
+      "security",
+      "traffic-control",
+      "response-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "on_error",
+        "type": "string",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Behavior if there is an error processing rules. Must be one of either `\"continue\"` or `\"halt\"` (default `\"halt\"`). More information can be found in the Managing Fallback Behavior section.",
+        "values": [],
+        "raw": "\n  <p>Behavior if there is an error processing rules. Must be one of either <code>\"continue\"</code> or <code>\"halt\"</code> (default <code>\"halt\"</code>).</p>\n  <p>More information can be found in the [Managing Fallback Behavior](#managing-fallback-behavior-on-error) section.</p>\n"
+      },
+      {
+        "name": "process_body",
+        "type": "bool",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "If `true`, rules for the response body are evaluated. Default is `false`. See Body Processing for details and limitations.",
+        "values": [],
+        "raw": "\n  <p>If <code>true</code>, rules for the response body are evaluated. Default is <code>false</code>.</p>\n  <p>See [Body Processing](#body-processing) for details and limitations.</p>\n"
+      },
+      {
+        "name": "exclude_rule_ids",
+        "type": "array of integers",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "List of OWASP CRS rule IDs to exclude from evaluation. The minimum value is `900000` and the maximum value is `999999`.",
+        "values": [],
+        "raw": "\n  <p>List of OWASP CRS rule IDs to exclude from evaluation.</p>\n  <p>The minimum value is <code>900000</code> and the maximum value is <code>999999</code>.</p>\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.owasp_crs_response.decision",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.anomaly_score",
+        "int"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.anomaly_score_threshold",
+        "int"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.matched_rules",
+        "array of objects"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.matched_rules[i].id",
+        "int"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.matched_rules[i].message",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.matched_rules[i].severity",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.matched_rules[i].data",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.owasp_crs_response.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_http_response:\n    - actions:\n        - type: owasp-crs-response\n          config:\n            on_error: halt\n",
+    "doc_phases": [
+      "on_http_response"
+    ],
+    "policy_type": "owasp-crs-response"
+  },
+  {
+    "type": "rate-limit",
+    "name": "Rate Limit",
+    "description": "Rate limit incoming traffic to your endpoint before it hits your upstream servers.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "traffic-control",
+      "request-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "A name for this rate limit configuration. Must be less than `1024` characters.",
+        "values": [],
+        "raw": "\n  <p>A name for this rate limit configuration. Must be less than <code>1024</code> characters.</p>\n"
+      },
+      {
+        "name": "enforce",
+        "type": "boolean",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "Controls whether the rate limit is actively applied at runtime. When enabled, requests exceeding the limit are blocked or throttled as configured. When disabled, the system evaluates the rate limit but does not enforce it, allowing you to test configurations, gather metrics, or return a custom response. The default value is `true`.",
+        "values": [],
+        "raw": "\n  <p>Controls whether the rate limit is actively applied at runtime. When enabled, requests exceeding the limit are blocked or throttled as configured. When disabled, the system evaluates the rate limit but does not enforce it, allowing you to test configurations, gather metrics, or return a custom response.</p>\n  <p>The default value is <code>true</code>.</p>\n"
+      },
+      {
+        "name": "algorithm",
+        "type": "enum",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "The rate limit algorithm to be used.",
+        "values": [
+          "`sliding_window`"
+        ],
+        "raw": "\n  <p>The rate limit algorithm to be used.</p>\n\n  <ConfigEnum label=\"Supported values\">\n     \n  </ConfigEnum>\n"
+      },
+      {
+        "name": "capacity",
+        "type": "integer",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "The maximum number of requests allowed to reach your upstream server. The minimum capacity is `1` and the maximum capacity is `2,000,000,000`.",
+        "values": [],
+        "raw": "\n  <p>The maximum number of requests allowed to reach your upstream server.</p>\n  <p>The minimum capacity is <code>1</code> and the maximum capacity is <code>2,000,000,000</code>.</p>\n"
+      },
+      {
+        "name": "rate",
+        "type": "string",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "The duration in which events may be limited based on the current capacity. Must be specified as a time duration that is a multiple of ten seconds (for example, `\"90s\"`, `\"10m\"`). The minimum value is `\"60s\"` and the maximum value is `\"24h\"`.",
+        "values": [],
+        "raw": "\n  <p>The duration in which events may be limited based on the current capacity. Must be specified as a time duration that is a multiple of ten seconds (for example, <code>\"90s\"</code>, <code>\"10m\"</code>).</p>\n  <p>The minimum value is <code>\"60s\"</code> and the maximum value is <code>\"24h\"</code>.</p>\n"
+      },
+      {
+        "name": "bucket_key",
+        "type": "array of strings",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "The elements of this collection define the unique key of a request to track the rate at which the capacity is being met. Each bucket key is a CEL expression which includes all valid Traffic Policy variables and macros. Up to ten bucket keys can be specified. For multiple buckets, the action will rate limit by each unique combination of buckets.",
+        "values": [
+          "`req.host` - The Host of the request.",
+          "`conn.client_ip` - The client IP address.",
+          "`getReqHeader('X-Example-Header-Name')` - The value for the specified header key, if it exists."
+        ],
+        "raw": "\n  <p>The elements of this collection define the unique key of a request to track the rate at which the capacity is being met.</p>\n  <p>Each bucket key is a CEL expression which includes all valid Traffic Policy [variables](/docs/gateway/traffic-policy/variables/) and [macros](/docs/gateway/traffic-policy/macros/).</p>\n\n  <ConfigEnum label=\"Sample buckets\">\n     \n     \n     \n  </ConfigEnum>\n\n  <p>Up to ten bucket keys can be specified. For multiple buckets, the action will rate limit by each unique combination of buckets.</p>\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.rate_limit.bucket_key",
+        "string"
+      ],
+      [
+        "actions.ngrok.rate_limit.limited",
+        "boolean"
+      ],
+      [
+        "actions.ngrok.rate_limit.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.rate_limit.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: rate-limit\n          config:\n            name: Only allow 30 requests per minute\n            algorithm: sliding_window\n            capacity: 30\n            rate: 60s\n            bucket_key:\n              - 'hasReqHeader(''host'') ? getReqHeader(''host'')[0] : ''unknown'''\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "rate-limit"
+  },
+  {
+    "type": "redirect",
+    "name": "Redirect",
+    "description": "Redirect users through URL transformations using regular expressions.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "request-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "from",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "A regular expression pattern used to match a part of the URL.",
+        "values": [],
+        "raw": "\n  A regular expression pattern used to match a part of the URL.\n"
+      },
+      {
+        "name": "to",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 0,
+        "desc": "A regular expression pattern used to replace the matched part of the URL.",
+        "values": [],
+        "raw": "\n  A regular expression pattern used to replace the matched part of the URL.\n"
+      },
+      {
+        "name": "status_code",
+        "type": "integer",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "A `3xx` status code used for redirecting.",
+        "values": [],
+        "raw": "\n  A <code>3xx</code> status code used for redirecting.\n"
+      },
+      {
+        "name": "headers",
+        "type": "object",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "Map of key-value headers to be added to the response. Maximum `10` headers can be specified.",
+        "values": [],
+        "raw": "\n  Map of key-value headers to be added to the response.\n  Maximum <code>10</code> headers can be specified.\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.redirect.matches",
+        "array of strings"
+      ],
+      [
+        "actions.ngrok.redirect.url",
+        "string"
+      ],
+      [
+        "actions.ngrok.redirect.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.redirect.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: redirect\n          config:\n            from: ^(https?://[^/]+)/products(.*)$\n            to: $1/store/products$2\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "redirect"
+  },
+  {
+    "type": "remove-headers",
+    "name": "Remove Headers",
+    "description": "Remove headers from incoming requests or outgoing responses.",
+    "phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "categories": [
+      "request-modification",
+      "response-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "headers",
+        "type": "array of strings",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "List of header keys to remove from the request or response. Minimum `1`, Maximum `10`.",
+        "values": [],
+        "raw": "\n  List of header keys to remove from the request or response.\n\n  Minimum <code>1</code>, Maximum <code>10</code>.\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.remove_headers.headers_removed",
+        "array of strings"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: remove-headers\n          config:\n            headers:\n              - x-client-version\n              - x-trace-id\n",
+    "doc_phases": [
+      "on_http_request",
+      "on_http_response"
+    ],
+    "policy_type": "remove-headers"
+  },
+  {
+    "type": "request-body-find-replace",
+    "name": "Request Body Find & Replace",
+    "description": "Find and replace text patterns in HTTP request bodies using regular expressions.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "request-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "replacements",
+        "type": "array",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Array of replacement rules to apply to the request body. Rules are applied in order. Minimum `1` replacement required.",
+        "values": [],
+        "raw": "\n  Array of replacement rules to apply to the request body. Rules are applied in order.\n\n  Minimum `1` replacement required.\n\n  "
+      },
+      {
+        "name": "replacements.from",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 1,
+        "desc": "Regular expression pattern to match. Supports RE2 syntax. CEL interpolation is supported for dynamic patterns.",
+        "values": [],
+        "raw": "\n    Regular expression pattern to match. Supports [RE2 syntax](https://github.com/google/re2/wiki/Syntax).\n    CEL interpolation is supported for dynamic patterns.\n  "
+      },
+      {
+        "name": "replacements.to",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 1,
+        "desc": "Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
+        "values": [],
+        "raw": "\n    Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.request_body_find_replace.replacements",
+        "array"
+      ],
+      [
+        "actions.ngrok.request_body_find_replace.replacements.replacement_index",
+        "integer"
+      ],
+      [
+        "actions.ngrok.request_body_find_replace.replacements.matched_content",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: request-body-find-replace\n          config:\n            replacements:\n              - from: '\"api_key\":\\s*\"[^\"]*\"'\n                to: '\"api_key\": \"[REDACTED]\"'\n              - from: \"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}\"\n                to: \"[EMAIL REDACTED]\"\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "request-body-find-replace"
+  },
+  {
+    "type": "response-body-find-replace",
+    "name": "Response Body Find & Replace",
+    "description": "Find and replace text patterns in HTTP response bodies using regular expressions.",
+    "phases": [
+      "on_http_response"
+    ],
+    "categories": [
+      "response-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "replacements",
+        "type": "array",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Array of replacement rules to apply to the response body. Rules are applied in order. Minimum `1` replacement required.",
+        "values": [],
+        "raw": "\n  Array of replacement rules to apply to the response body. Rules are applied in order.\n\n  Minimum `1` replacement required.\n\n  "
+      },
+      {
+        "name": "replacements.from",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 1,
+        "desc": "Regular expression pattern to match. Supports RE2 syntax. CEL interpolation is supported for dynamic patterns.",
+        "values": [],
+        "raw": "\n    Regular expression pattern to match. Supports [RE2 syntax](https://github.com/google/re2/wiki/Syntax).\n    CEL interpolation is supported for dynamic patterns.\n  "
+      },
+      {
+        "name": "replacements.to",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 1,
+        "desc": "Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
+        "values": [],
+        "raw": "\n    Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.response_body_find_replace.replacements",
+        "array"
+      ],
+      [
+        "actions.ngrok.response_body_find_replace.replacements.replacement_index",
+        "integer"
+      ],
+      [
+        "actions.ngrok.response_body_find_replace.replacements.matched_content",
+        "string"
+      ]
+    ],
+    "example": "  on_http_response:\n    - actions:\n        - type: response-body-find-replace\n          config:\n            replacements:\n              # Redact SSN patterns\n              - from: \"\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b\"\n                to: \"[SSN REDACTED]\"\n              # Redact credit card numbers\n              - from: \"\\\\b\\\\d{4}[- ]?\\\\d{4}[- ]?\\\\d{4}[- ]?\\\\d{4}\\\\b\"\n                to: \"[CARD REDACTED]\"\n              # Redact phone numbers\n              - from: \"\\\\b\\\\d{3}[-.\\\\s]?\\\\d{3}[-.\\\\s]?\\\\d{4}\\\\b\"\n                to: \"[PHONE REDACTED]\"\n",
+    "doc_phases": [
+      "on_http_response"
+    ],
+    "policy_type": "response-body-find-replace"
+  },
+  {
+    "type": "restrict-ips",
+    "name": "Restrict IPs",
+    "description": "Allow or deny incoming traffic based on the client IP.",
+    "phases": [
+      "on_http_request",
+      "on_tcp_connect"
+    ],
+    "categories": [
+      "security",
+      "connection-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "enforce",
+        "type": "boolean",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Default true. If false, continue to the next action even if the IP is not permitted.",
+        "values": [],
+        "raw": "\n  Default true. If false, continue to the next action even if the IP is not permitted.\n"
+      },
+      {
+        "name": "allow",
+        "type": "array of strings",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "A list of CIDRs that are allowed.",
+        "values": [],
+        "raw": "\n  A list of CIDRs that are allowed.\n"
+      },
+      {
+        "name": "deny",
+        "type": "array of strings",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "A list of CIDRs that are denied.",
+        "values": [],
+        "raw": "\n  A list of CIDRs that are denied.\n"
+      },
+      {
+        "name": "ip_policies",
+        "type": "array of refs",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "List of IP Policy identifiers to be checked if the source IP is allowed access.",
+        "values": [],
+        "raw": "\n  List of [IP Policy](/docs/api-reference/ippolicies/list) identifiers to be checked if the source IP is allowed access.\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.restrict_ips.action",
+        "string"
+      ],
+      [
+        "actions.ngrok.restrict_ips.matched_cidr",
+        "string"
+      ],
+      [
+        "actions.ngrok.restrict_ips.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.restrict_ips.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_tcp_connect:\n    - actions:\n        - type: restrict-ips\n          config:\n            enforce: true\n            allow:\n              - 1.1.1.1/32\n            deny:\n              - 110.0.0.0/8\n",
+    "doc_phases": [
+      "on_http_request",
+      "on_http_response",
+      "on_tcp_connect"
+    ],
+    "policy_type": "restrict-ips"
+  },
+  {
+    "type": "set-vars",
+    "name": "Set Vars",
+    "description": "Set custom variables for use in your traffic policy.",
+    "phases": [
+      "on_http_request",
+      "on_http_response",
+      "on_tcp_connect"
+    ],
+    "categories": [
+      "request-modification",
+      "response-modification",
+      "connection-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "vars",
+        "type": "array of map[string]any",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "List of maps that have a key of string and a value of any valid CEL type Each map must be of exactly size `1`, and represents one variable where the key is the name of the variable: ```yaml theme={null} vars: - variable_a: value - variable_b: value ```",
+        "values": [],
+        "raw": "\n  List of maps that have a key of string and a value of any valid CEL type\n\n  <Note>\n    Each map must be of exactly size `1`, and represents one variable where the\n    key is the name of the variable:\n\n    ```yaml theme={null}\n    vars:\n      - variable_a: value\n      - variable_b: value\n    ```\n  </Note>\n"
+      }
+    ],
+    "results": [],
+    "example": "  on_http_request:\n    - actions:\n        - type: set-vars\n          config:\n            vars:\n              - sample_string: bar\n              - sample_double: 1.5\n              - sample_bool: true\n              - sample_null: null\n              - sample_list:\n                  - 1\n                  - 2\n                  - 3\n              - sample_map:\n                  key: value\n              - sample_nested_map:\n                  key:\n                    - value1\n                    - value2\n    - expressions:\n        - vars.sample_bool == true\n      actions:\n        - type: custom-response\n          config:\n            status_code: 200\n            headers:\n              content-type: text/plain\n            body: ${vars.sample_string} ${vars.sample_double} ${vars.sample_list[0]} ${vars.sample_map.key} ${vars.sample_nested_map.key[1]}\n",
+    "doc_phases": [
+      "on_http_request",
+      "on_http_response",
+      "on_tcp_connect"
+    ],
+    "policy_type": "set-vars"
+  },
+  {
+    "type": "sse-find-replace",
+    "name": "SSE Find & Replace",
+    "description": "Find and replace text patterns in Server-Sent Events (SSE) streams.",
+    "phases": [
+      "on_event_stream_message"
+    ],
+    "categories": [
+      "response-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "replacements",
+        "type": "array",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "Array of replacement rules to apply to SSE messages. Rules are applied in order. Minimum `1` replacement required.",
+        "values": [],
+        "raw": "\n  Array of replacement rules to apply to SSE messages. Rules are applied in order.\n\n  Minimum `1` replacement required.\n\n  "
+      },
+      {
+        "name": "replacements.field",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 1,
+        "desc": "The SSE field to apply the replacement to. Valid values are `data` and `retry`. Defaults to `data` if not specified. CEL interpolation is supported.",
+        "values": [],
+        "raw": "\n    The SSE field to apply the replacement to. Valid values are `data` and `retry`.\n    Defaults to `data` if not specified.\n    CEL interpolation is supported.\n  "
+      },
+      {
+        "name": "replacements.from",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 1,
+        "desc": "Regular expression pattern to match. Supports RE2 syntax. CEL interpolation is supported for dynamic patterns.",
+        "values": [],
+        "raw": "\n    Regular expression pattern to match. Supports [RE2 syntax](https://github.com/google/re2/wiki/Syntax).\n    CEL interpolation is supported for dynamic patterns.\n  "
+      },
+      {
+        "name": "replacements.to",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 1,
+        "desc": "Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
+        "values": [],
+        "raw": "\n    Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.sse_find_replace.replacements",
+        "array"
+      ],
+      [
+        "actions.ngrok.sse_find_replace.replacements.replacement_index",
+        "integer"
+      ],
+      [
+        "actions.ngrok.sse_find_replace.replacements.matched_content",
+        "string"
+      ]
+    ],
+    "example": "  on_event_stream_message:\n    - actions:\n        - type: sse-find-replace\n          config:\n            replacements:\n              # Redact SSN patterns in streaming content\n              - field: data\n                from: \"\\\\d{3}-\\\\d{2}-\\\\d{4}\"\n                to: \"[SSN REDACTED]\"\n              # Redact email addresses\n              - field: data\n                from: \"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}\"\n                to: \"[EMAIL REDACTED]\"\n",
+    "doc_phases": [
+      "on_event_stream_message"
+    ],
+    "policy_type": "sse-find-replace"
+  },
+  {
+    "type": "terminate-tls",
+    "name": "Terminate TLS",
+    "description": "Control the behavior of TLS termination on your endpoints.",
+    "phases": [
+      "on_tcp_connect"
+    ],
+    "categories": [
+      "connection-modification",
+      "security"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "min_version",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "The minimum TLS version to support. Must be one of `1.2` or `1.3`.",
+        "values": [],
+        "raw": "\n  The minimum TLS version to support. Must be one of `1.2` or `1.3`.\n"
+      },
+      {
+        "name": "max_version",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "The maximum TLS version to support. Must be one of `1.2` or `1.3`.",
+        "values": [],
+        "raw": "\n  The maximum TLS version to support. Must be one of `1.2` or `1.3`.\n"
+      },
+      {
+        "name": "server_private_key",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "The PEM-encoded private key for the server if using a custom certificate (must be specified with `server_certificate`).",
+        "values": [],
+        "raw": "\n  The PEM-encoded private key for the server if using a custom certificate (must be specified with `server_certificate`).\n"
+      },
+      {
+        "name": "server_certificate",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "The PEM-encoded certificate for the server if using a custom certificate (must be specified with `server_private_key`).",
+        "values": [],
+        "raw": "\n  The PEM-encoded certificate for the server if using a custom certificate (must be specified with `server_private_key`).\n"
+      },
+      {
+        "name": "mutual_tls_certificate_authorities",
+        "type": "array of strings",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "A list of PEM-encoded Certificate Authority certificates and/or Certificate Authority IDs that are trusted for mutual TLS authentication.",
+        "values": [],
+        "raw": "\n  A list of PEM-encoded Certificate Authority certificates and/or Certificate Authority IDs that are trusted for mutual TLS authentication.\n"
+      },
+      {
+        "name": "mutual_tls_verification_strategy",
+        "type": "string",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "The strategy to use for mutual TLS verification. Require and verify Require any Request",
+        "values": [],
+        "raw": "\n  The strategy to use for mutual TLS verification.\n\n  <ConfigEnum>\n    <ConfigEnumOption value=\"require-and-verify\">Require and verify</ConfigEnumOption>\n    <ConfigEnumOption value=\"require-any\">Require any</ConfigEnumOption>\n    <ConfigEnumOption value=\"request\">Request</ConfigEnumOption>\n  </ConfigEnum>\n"
+      }
+    ],
+    "results": [],
+    "example": "  on_tcp_connect:\n    - actions:\n        - type: terminate-tls\n          config:\n            min_version: '1.3'\n            max_version: '1.3'\n",
+    "doc_phases": [
+      "on_tcp_connect"
+    ],
+    "policy_type": "terminate-tls"
+  },
+  {
+    "type": "url-rewrite",
+    "name": "URL Rewrite",
+    "description": "Rewrite request URLs transparently using regular expressions.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "request-modification"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "from",
+        "type": "string",
+        "required": false,
+        "cel": true,
+        "depth": 0,
+        "desc": "A regular expression pattern used to match a part of the URL. Supports CEL Interpolation.",
+        "values": [],
+        "raw": "\n  <p>A regular expression pattern used to match a part of the URL.</p>\n  <p>Supports [CEL Interpolation](/docs/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n"
+      },
+      {
+        "name": "to",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 0,
+        "desc": "A regular expression pattern used to replace the matched part of the URL. Supports CEL Interpolation.",
+        "values": [],
+        "raw": "\n  <p>A regular expression pattern used to replace the matched part of the URL.</p>\n  <p>Supports [CEL Interpolation](/docs/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.url_rewrite.matches",
+        "array of strings"
+      ],
+      [
+        "actions.ngrok.url_rewrite.url",
+        "string"
+      ],
+      [
+        "actions.ngrok.url_rewrite.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.url_rewrite.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - expressions:\n        - req.url.path == '/products'\n      actions:\n        - type: url-rewrite\n          config:\n            from: /products\n            to: /products.php\n",
+    "doc_phases": [
+      "on_http_request"
+    ],
+    "policy_type": "url-rewrite"
+  },
+  {
+    "type": "verify-webhook",
+    "name": "Verify Webhook",
+    "description": "Validate incoming signatures against a known secret to ensure authenticity.",
+    "phases": [
+      "on_http_request"
+    ],
+    "categories": [
+      "security"
+    ],
+    "terminating": false,
+    "config": [
+      {
+        "name": "provider",
+        "type": "string",
+        "required": true,
+        "cel": false,
+        "depth": 0,
+        "desc": "The name of the provider to verify webhook requests from. Value must be a supported provider identifier. Don't see your provider? Request support for it here.",
+        "values": [],
+        "raw": "\n  <p>The name of the provider to verify webhook requests from.</p>\n  <p>Value must be a [supported provider](#supported-providers) identifier. Don't see your provider? [Request support for it here](https://dashboard.ngrok.com/early-access#webhook-providers).</p>\n"
+      },
+      {
+        "name": "secret",
+        "type": "string",
+        "required": true,
+        "cel": true,
+        "depth": 0,
+        "desc": "The secret key used to validate webhook requests from the specified provider. Supports CEL Interpolation.",
+        "values": [],
+        "raw": "\n  <p>The secret key used to validate webhook requests from the specified provider.</p>\n  <p>Supports [CEL Interpolation](/docs/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n"
+      },
+      {
+        "name": "enforce",
+        "type": "bool",
+        "required": false,
+        "cel": false,
+        "depth": 0,
+        "desc": "When `true`, the request will be halted if the webhook is not valid and no further actions will run. However when `false`, subsequent actions will run even if the webhook was not valid. Default `true`.",
+        "values": [],
+        "raw": "\n  <p>When `true`, the request will be halted if the webhook is not valid and no further actions will run. However when `false`, subsequent actions will run even if the webhook was not valid.</p>\n  <p>Default <code>true</code>.</p>\n"
+      }
+    ],
+    "results": [
+      [
+        "actions.ngrok.verify_webhook.verified",
+        "bool"
+      ],
+      [
+        "actions.ngrok.verify_webhook.error.code",
+        "string"
+      ],
+      [
+        "actions.ngrok.verify_webhook.error.message",
+        "string"
+      ]
+    ],
+    "example": "  on_http_request:\n    - actions:\n        - type: verify-webhook\n          config:\n            provider: gitlab\n            secret: secret!\n        - type: custom-response\n          config:\n            status_code: 200\n            headers:\n              content-type: text/plain\n            body: GitLab webhook verified\n",
+    "doc_phases": [],
+    "policy_type": "verify-webhook"
+  }
+]

@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Keeps the SHA-pinned actions in .github/workflows current. Dependabot
+  # updates the SHA and the version comment together.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "04:30"
+      timezone: "America/Los_Angeles"
+    # Wait a week after a release before proposing it, so a bad or
+    # compromised release has time to be caught and pulled.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore(github-actions)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
