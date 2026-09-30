@@ -1,0 +1,47 @@
+{
+  "name": "ngrok",
+  "description": "Expose local services, route and secure traffic, receive webhooks, and more.",
+  "author": {
+    "name": "ngrok",
+    "email": "support@ngrok.com",
+    "url": "https://ngrok.com"
+  },
+  "homepage": "https://github.com/ngrok/skills",
+  "repository": "https://github.com/ngrok/skills",
+  "license": "MIT",
+  "keywords": [
+    "ngrok",
+    "connectivity",
+    "gateway",
+    "networking",
+    "webhooks",
+    "traffic-policy",
+    "mcp",
+    "reverse-proxy"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "ngrok",
+    "shortDescription": "Expose local services, route and secure traffic, receive webhooks, and more.",
+    "developerName": "ngrok",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "brandColor": "#1E1E1E",
+    "brandColorDark": "#FFFFFF",
+    "composerIcon": "./assets/composer-icon.png",
+    "logo": "./assets/logo.png",
+    "defaultPrompt": [
+      "Expose my app on port 3000 to the internet",
+      "Require Google login on my ngrok URL",
+      "Test Stripe webhooks locally"
+    ],
+    "websiteURL": "https://ngrok.com/",
+    "privacyPolicyURL": "https://ngrok.com/privacy",
+    "termsOfServiceURL": "https://ngrok.com/tos",
+    "supportURL": "https://ngrok.com/support",
+    "screenshots": []
+  }
+}

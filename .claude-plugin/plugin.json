@@ -3,7 +3,7 @@
   "description": "Expose local services, route and secure traffic, receive webhooks, and more.",
   "author": {
     "name": "ngrok",
-    "url": "https://github.com/ngrok/skills"
+    "url": "https://ngrok.com"
   },
   "license": "MIT",
   "repository": "https://github.com/ngrok/skills",

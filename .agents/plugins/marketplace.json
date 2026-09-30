@@ -1,0 +1,20 @@
+{
+  "name": "ngrok",
+  "interface": {
+    "displayName": "ngrok"
+  },
+  "plugins": [
+    {
+      "name": "ngrok",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
