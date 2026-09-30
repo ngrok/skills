@@ -2,26 +2,31 @@
 
 A collection of skills for AI coding agents, covering how to expose local services, route and secure traffic, receive webhooks, and more.
 
-Skills follow the [Agent Skills](https://agentskills.io/) format, so this repo works both as a standalone skill pack and as a Claude Code plugin.
+Skills follow the [Agent Skills](https://agentskills.io/) format, so this repo works as a standalone skill pack and as a plugin for Claude Code, Cursor, ChatGPT, and Codex.
 
-## Getting Started
+## Installation
 
-### Installation
+Any [Agent Skills](https://agentskills.io/)-compatible agent:
 
 ```bash
 npx skills add ngrok/skills
 ```
 
-That's it. This installs to any [Agent Skills](https://agentskills.io/)-compatible agent.
+Or install as a plugin:
 
-**Claude Code users** can alternatively install this as a plugin, which adds `/ngrok:*` slash commands:
+- **Claude Code** (adds `/ngrok:*` slash commands):
 
-```
-/plugin marketplace add ngrok/skills
-/plugin install ngrok@ngrok
-```
+  ```
+  /plugin marketplace add ngrok/skills
+  /plugin install ngrok@ngrok
+  ```
 
-**Cursor users** can alternatively install this as a plugin: **Customize → Plugins → Add marketplace → From GitHub Repository**, then paste `ngrok/skills`.
+- **Cursor:** Customize → Plugins → Add marketplace → From GitHub Repository → `ngrok/skills`.
+- **ChatGPT and Codex:** run the command below, then restart and install **ngrok** from the Plugins Directory.
+
+  ```bash
+  codex plugin marketplace add ngrok/skills
+  ```
 
 ## Skills
 
@@ -66,25 +71,6 @@ In Claude Code, you can also invoke a skill directly:
 
 ```
 /ngrok:expose-localhost
-```
-
-## Architecture
-
-```
-skills/
-├── .claude-plugin/
-│   ├── plugin.json          # Claude Code plugin manifest
-│   └── marketplace.json     # Marketplace listing for `/plugin marketplace add`
-├── .cursor-plugin/
-│   ├── plugin.json          # Cursor plugin manifest
-│   └── marketplace.json     # Marketplace listing for Cursor's "From GitHub Repository"
-├── skills/
-│   ├── expose-localhost/
-│   │   ├── SKILL.md
-│   │   └── references/      # optional supporting docs
-│   └── ...
-├── README.md
-└── LICENSE
 ```
 
 Each skill contains:
