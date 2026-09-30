@@ -57,7 +57,8 @@ def fetch(url: str) -> str:
 
 def clean(text: str) -> str:
     """Turn a chunk of doc markup into one readable sentence-ish line."""
-    text = re.sub(r"<ConfigEnum[^>]*>|</ConfigEnum>", " ", text)
+    # The <ConfigEnum> wrapper only; options are parsed out before this runs.
+    text = re.sub(r"<ConfigEnum(?:\s[^>]*)?>|</ConfigEnum>", " ", text)
     text = re.sub(r"</?p>", " ", text)
     text = re.sub(r"<code>(.*?)</code>", r"`\1`", text, flags=re.S)
     text = re.sub(r"<br\s*/?>", " ", text)
@@ -184,6 +185,13 @@ FIELD_OPEN = re.compile(
     r"(?:\s+required=\{(true|false)\})?(?:\s+cel=\{(true|false)\})?[^>]*>"
 )
 
+# Attributes are optional and may appear in any order; `value` wins over the
+# tag body when present.
+ENUM_OPTION = re.compile(
+    r"<ConfigEnumOption(?:\s[^>]*?\bvalue=\"([^\"]*)\")?[^>]*>(.*?)</ConfigEnumOption>",
+    re.S,
+)
+
 
 def section(md: str, heading: str, level: str | None = None) -> str:
     """Return the body under a heading, up to the next heading of the same or
@@ -215,12 +223,13 @@ def parse_fields(body: str) -> list[Field]:
         pending.clear()
         if target is None or not text.strip():
             return
-        opts = re.findall(r"<ConfigEnumOption>(.*?)</ConfigEnumOption>", text, re.S)
-        for o in opts:
-            v = clean(o)
+        for m in ENUM_OPTION.finditer(text):
+            # Some pages show a display label and carry the policy value in an
+            # attribute: <ConfigEnumOption value="require-any">Require any<...>.
+            v = m.group(1) if m.group(1) is not None else clean(m.group(2))
             if v and v not in target.values:
                 target.values.append(v)
-        text = re.sub(r"<ConfigEnumOption>.*?</ConfigEnumOption>", " ", text, flags=re.S)
+        text = ENUM_OPTION.sub(" ", text)
         target.raw += text
         extra = clean(text)
         if extra:

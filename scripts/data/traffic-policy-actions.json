@@ -2074,9 +2074,13 @@
         "required": false,
         "cel": false,
         "depth": 0,
-        "desc": "The strategy to use for mutual TLS verification. Require and verify Require any Request",
-        "values": [],
-        "raw": "\n  The strategy to use for mutual TLS verification.\n\n  <ConfigEnum>\n    <ConfigEnumOption value=\"require-and-verify\">Require and verify</ConfigEnumOption>\n    <ConfigEnumOption value=\"require-any\">Require any</ConfigEnumOption>\n    <ConfigEnumOption value=\"request\">Request</ConfigEnumOption>\n  </ConfigEnum>\n"
+        "desc": "The strategy to use for mutual TLS verification.",
+        "values": [
+          "require-and-verify",
+          "require-any",
+          "request"
+        ],
+        "raw": "\n  The strategy to use for mutual TLS verification.\n\n  <ConfigEnum>\n     \n     \n     \n  </ConfigEnum>\n"
       }
     ],
     "results": [],
