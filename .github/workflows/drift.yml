@@ -16,22 +16,12 @@ permissions:
 
 jobs:
   action-catalog:
-    # The PR is opened with the docs bot's token, not GITHUB_TOKEN, so this
-    # job's own token stays read-only.
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # push the bot/action-catalog branch
+      pull-requests: write   # open or update the PR
+      actions: write         # dispatch ci.yml on the PR branch
     steps:
-      # A PR opened with the default GITHUB_TOKEN does not trigger CI, so use
-      # the ngrok docs bot (a GitHub App). The token lasts one hour, is scoped
-      # to this repo, and has only the two permissions the PR step needs.
-      - name: Generate bot token
-        id: bot
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          client-id: ${{ secrets.NGROK_DOCS_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.NGROK_DOCS_BOT_PRIVATE_KEY }}
-          permission-contents: write
-          permission-pull-requests: write
-
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -42,10 +32,13 @@ jobs:
       - name: Render the catalog
         run: python3 scripts/gen_action_catalog.py render
 
+      # Uses GITHUB_TOKEN. The repo setting "Allow GitHub Actions to create and
+      # approve pull requests" must stay on for this step to work.
       - name: Open a PR if anything changed
+        id: pr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
-          token: ${{ steps.bot.outputs.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: bot/action-catalog
           delete-branch: true
           commit-message: regenerate action catalog from docs
@@ -57,6 +50,16 @@ jobs:
             Before merging:
             - A new action may deserve a mention in `skills/ngrok-engine/SKILL.md`.
             - A removed or renamed action may still be used by a job skill.
+
+      # A PR opened with GITHUB_TOKEN does not trigger CI. A workflow_dispatch
+      # run is exempt from that rule, and its checks attach to the PR's head
+      # commit, so start CI on the PR branch directly.
+      - name: Run CI on the PR
+        if: steps.pr.outputs.pull-request-operation == 'created' || steps.pr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.pr.outputs.pull-request-branch }}
+        run: gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
 
   docs:
     # Link rot unrelated to actions, such as a moved page or a removed error
