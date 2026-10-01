@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Docs-side changes that happen without a PR here are caught weekly by drift.yml.
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    # Offline checks only. Fast, deterministic, required on every PR.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+
+      # The action catalog is rendered from a committed docs snapshot, so this
+      # needs no network. It fails if a generated file was edited by hand.
+      - name: Check generated files are up to date
+        run: python3 scripts/gen_action_catalog.py render --check
+
+      - name: Validate skills against the Agent Skills spec
+        run: |
+          for dir in skills/*/; do
+            uvx --from skills-ref@0.1.1 agentskills validate "$dir"
+          done
+
+      - name: Validate structure, references, manifests, and examples
+        run: uv run --with pyyaml==6.0.3 scripts/validate.py
+
+  docs:
+    # Network checks against ngrok.com/docs. Kept separate so a docs outage
+    # or a slow page does not block an unrelated PR.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+
+      - name: Check docs links, action types, and error codes
+        run: uv run --with pyyaml==6.0.3 scripts/validate.py --docs
