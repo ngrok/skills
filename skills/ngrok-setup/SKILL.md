@@ -37,7 +37,7 @@ If it is not obvious, the terminal path is the safe default for one-off tasks.
 
 The two credentials are not interchangeable and have very different blast radii: an API key administers the account, an authtoken only starts agent sessions. If a call fails with an auth error, check which one is in play before rotating anything.
 
-**ngrok MCP server (OAuth):** gives you, the agent, read access to the user's account. It is a third credential, separate from both of the above. If the user asks to connect it, give them the commands for their client from the [MCP server docs](https://ngrok.com/docs/mcp). Login is a browser step the user does themselves, like the authtoken. Most paid plans include the server; the free plan does not.
+**ngrok MCP server (OAuth):** gives you, the agent, read access to the user's account. It is a third credential, separate from both of the above. If the user asks to connect it, give them the commands for their client from the [MCP server docs](https://ngrok.com/docs/mcp-server). Login is a browser step the user does themselves, like the authtoken. The server is in early access. If ngrok rejects the account after sign-in, it doesn't have access yet; the user can request it at https://dashboard.ngrok.com/early-access#mcp-server.
 <!-- TODO(ADMIN-895): confirm the docs URL before launch. -->
 
 If the server is already connected, use it to check instead of asking: `platform_whoami` names the account, the caller's role, and the plan. `platform_list_authtokens` and `platform_list_api_keys` show which credentials exist and who owns them. No tool returns a secret value.
