@@ -1,6 +1,6 @@
 ---
 name: ngrok-setup
-description: Get authenticated and ready to use ngrok on whatever surface the task needs - agent CLI, an SDK, or infrastructure-as-code. Detects what is already installed, walks the one-time authtoken step, and routes to the right surface. Use before other ngrok tasks, or whenever an ngrok command fails with an authentication or configuration error. Use when the user says "set up ngrok", "install ngrok", "add my authtoken", "ngrok isn't authenticated", or "getting an auth error from ngrok".
+description: Get authenticated and ready to use ngrok on whatever surface the task needs - agent CLI, an SDK, or infrastructure-as-code. Detects what is already installed, walks the one-time authtoken step, and routes to the right surface. Use before other ngrok tasks, or whenever an ngrok command fails with an authentication or configuration error. Use when the user says "set up ngrok", "install ngrok", "add my authtoken", "ngrok isn't authenticated", "getting an auth error from ngrok", or "connect the ngrok MCP server".
 license: MIT
 metadata:
   author: ngrok
@@ -36,6 +36,11 @@ If it is not obvious, the terminal path is the safe default for one-off tasks.
 **IaC and the REST API (API key):** Terraform, the operator, and `api.ngrok.com` authenticate with an ngrok API key (the operator needs an API key *and* an authtoken), not the agent authtoken. Point the user to https://dashboard.ngrok.com/api-keys and have them set it as the provider/operator credential or `NGROK_API_KEY`. See `ngrok-surfaces`.
 
 The two credentials are not interchangeable and have very different blast radii: an API key administers the account, an authtoken only starts agent sessions. If a call fails with an auth error, check which one is in play before rotating anything.
+
+**ngrok MCP server (OAuth):** gives you, the agent, read access to the user's account. It is a third credential, separate from both of the above. If the user asks to connect it, give them the commands for their client from the [MCP server docs](https://ngrok.com/docs/mcp). Login is a browser step the user does themselves, like the authtoken. Most paid plans include the server; the free plan does not.
+<!-- TODO(ADMIN-895): confirm the docs URL before launch. -->
+
+If the server is already connected, use it to check instead of asking: `platform_whoami` names the account, the caller's role, and the plan. `platform_list_authtokens` and `platform_list_api_keys` show which credentials exist and who owns them. No tool returns a secret value.
 
 ## 3. Make sure the tool is present
 

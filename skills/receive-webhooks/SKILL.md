@@ -67,3 +67,4 @@ Give the user the public URL to paste into the provider's webhook settings.
 - Never hardcode the signing secret; use a Vault or env var.
 - Do not ask the user to paste the signing secret into the chat, and do not accept one offered that way. Have them put it in a Vault via ngrok dashboard or API (`ngrok api secrets create`) or an env var themselves, and reference it from the policy. A `whsec_...` in a transcript is a leaked secret.
 - Nothing that rewrites the body may run before `verify-webhook`, or the signature check breaks.
+- If the ngrok MCP server is connected, `gw_query_traffic_inspector` shows whether the provider's request arrived and what the endpoint returned. Check it before you debug the receiver.

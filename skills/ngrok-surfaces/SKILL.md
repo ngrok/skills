@@ -52,6 +52,7 @@ These are not interchangeable and have very different blast radii. If a call fai
 ## Notes for agents
 
 - Run the commands yourself when you have a shell; hand back the result, not instructions.
+- The ngrok MCP server is not a surface for applying configuration. Use it to check state before and after you apply: `gw_list_endpoints` or `gw_get_endpoint` to confirm the endpoint is live, and `gw_validate_traffic_policy` to check a policy (see `ngrok-engine`).
 - Keep the policy in its own `policy.yaml` and reference it. That is what makes it portable when the user adds a second surface later, which they usually do.
 - TCP endpoints are **not** supported by the Kubernetes Operator. If the user needs TCP on k8s, surface that early rather than discovering it late.
 - Do not port config between surfaces from memory - the shapes differ enough to fail in ways that look like network problems. Read the target surface's reference file.
