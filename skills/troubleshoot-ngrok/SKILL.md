@@ -7,7 +7,7 @@ metadata:
   version: "1.0"
   category: troubleshooting
   surface: job
-compatibility: Requires ngrok CLI installed and authenticated.
+compatibility: Requires ngrok CLI installed and authenticated. Uses the ngrok MCP server for live account state when it is connected.
 ---
 
 # Troubleshoot ngrok
@@ -17,6 +17,18 @@ Diagnose a failing ngrok endpoint or agent. Work from the error code when there 
 ## First: get the code
 
 ngrok errors carry an `ERR_NGROK_####` code, on the error page or in agent output. Get it - it points straight at the cause. If there's no code, use the symptom sections below.
+
+## If the ngrok MCP server is connected
+
+Check the account's live state yourself instead of asking the user. Look for these tools:
+
+- **3200 / "is anything serving this URL?"** -> `gw_get_endpoint` with the URL. If nothing serves it, no agent is connected for that URL. `gw_list_endpoints` shows what the account does serve - a near-miss URL is a common cause.
+- **Agent won't stay up, or must upgrade** -> `gw_list_agents`: connected agents, versions, and any deprecation deadline.
+- **Failed or slow requests** -> `gw_query_traffic_inspector`, then `gw_get_traffic_inspector_request` for one request. For TCP, `gw_query_connections` and `gw_get_connection`.
+- **Rate limited, or requests rejected** -> `platform_get_enforced_limits` first. `platform_get_usage` reports consumption, not caps.
+- **Traffic Policy errors** -> `gw_validate_traffic_policy` reports each problem with its line and column.
+
+Without the server, use the CLI and the steps below.
 
 ## High-frequency codes
 

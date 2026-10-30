@@ -28,6 +28,33 @@ Or install as a plugin:
   codex plugin marketplace add ngrok/skills
   ```
 
+## ngrok MCP server
+
+The skills teach your agent how ngrok works. The ngrok MCP server (`https://mcp.ngrok.com/mcp`) lets it read your account: endpoints, connected agents, Traffic Inspector, usage, limits, and the ngrok docs ([learn more in the MCP server docs](https://ngrok.com/docs/mcp-server)). It can also validate a Traffic Policy before you apply it. When the server is connected, the skills use its tools to check live state instead of asking you. Without it, they fall back to the CLI and API.
+
+<!-- TODO(ADMIN-895): confirm the docs URL before launch. -->
+
+- **Claude Code:**
+
+  ```bash
+  claude mcp add --transport http --scope user ngrok https://mcp.ngrok.com/mcp
+  claude mcp login ngrok
+  ```
+
+- **Codex:**
+
+  ```bash
+  codex mcp add ngrok --url https://mcp.ngrok.com/mcp
+  codex mcp login ngrok \
+    --scopes ship:apps:read,ship:apps:write,integrations:read,events:read,team:read,api-keys:read,ssh-credentials:read
+  ```
+
+- **Other clients:** add `https://mcp.ngrok.com/mcp` as a streamable HTTP server.
+
+Login opens a browser. Sign in to ngrok and approve the consent screen. The MCP server is in early access. [Request access](https://dashboard.ngrok.com/early-access#mcp-server) in the dashboard. No tool returns a token, key, or other secret.
+
+This is ngrok's own MCP server. To put _your_ MCP server behind ngrok, use the `run-mcp-gateway` skill.
+
 ## Skills
 
 | Skill                      | Covers                                                                                                                                | Use when                                                                                             |
