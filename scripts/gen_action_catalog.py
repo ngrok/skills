@@ -8,6 +8,7 @@ Two steps, so the check that runs on every PR needs no network:
     python3 scripts/gen_action_catalog.py render --check   # exit 1 if Markdown is stale
 
 Source of truth: https://ngrok.com/docs/gateway/traffic-policy/actions
+                 (the action list itself is read from ACTION_HUB, see below)
 Snapshot:        scripts/data/traffic-policy-actions.json (committed)
 Output:          skills/ngrok-engine/references/action-catalog.md (index),
                  skills/ngrok-engine/references/actions/*.md (one per action),
@@ -29,6 +30,9 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 DOCS = "https://ngrok.com/docs/gateway/traffic-policy/actions"
+# The docs render the action list from this snippet. The published .md page no
+# longer inlines it, so read the snippet from the public docs repo instead.
+ACTION_HUB = "https://raw.githubusercontent.com/ngrok/ngrok-docs/main/snippets/ActionHub.jsx"
 
 REPO = Path(__file__).resolve().parent.parent
 SNAPSHOT = REPO / "scripts" / "data" / "traffic-policy-actions.json"
@@ -514,7 +518,7 @@ def load_snapshot() -> list[Action]:
 # --------------------------------------------------------------------------
 
 def cmd_fetch() -> int:
-    actions = parse_index(fetch(DOCS + ".md"))
+    actions = parse_index(fetch(ACTION_HUB))
     print(f"found {len(actions)} actions", file=sys.stderr)
     for a in actions:
         print(f"  {a.type}", file=sys.stderr)
