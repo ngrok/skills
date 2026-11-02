@@ -28,32 +28,6 @@ Or install as a plugin:
   codex plugin marketplace add ngrok/skills
   ```
 
-## ngrok MCP server
-
-The skills teach your agent how ngrok works. The ngrok MCP server (`https://mcp.ngrok.com/mcp`) lets it read and manage your account: endpoints, connected agents, Traffic Inspector, usage, limits, and the ngrok docs ([learn more in the MCP server docs](https://ngrok.com/docs/mcp-server)). It can also validate a Traffic Policy before you apply it. When the server is connected, the skills use its tools to check live state instead of asking you. Without it, they fall back to the CLI and API. The server is available on all ngrok plans, including the free plan.
-
-If you installed the skills as a plugin, the server is already configured. Sign in from your client's MCP settings (in Claude Code, run `/mcp`). To add it by hand:
-
-- **Claude Code:**
-
-  ```bash
-  claude mcp add --transport http --scope user ngrok https://mcp.ngrok.com/mcp
-  claude mcp login ngrok
-  ```
-
-- **Codex:**
-
-  ```bash
-  codex mcp add ngrok --url https://mcp.ngrok.com/mcp
-  codex mcp login ngrok
-  ```
-
-- **Cursor and other clients:** follow the [client-specific quickstart](https://ngrok.com/docs/mcp-server). Some clients need extra OAuth configuration.
-
-Login opens a browser. Sign in to ngrok and approve the consent screen. Access is not read-only: the agent acts as you, with your role's permissions, so check each change before you approve it. No tool returns a token, key, or other secret.
-
-This is ngrok's own MCP server. To put _your_ MCP server behind ngrok, use the `run-mcp-gateway` skill.
-
 ## Skills
 
 | Skill                      | Covers                                                                                                                                | Use when                                                                                             |
@@ -74,6 +48,10 @@ Two skills are reference material rather than tasks. The skills above load them 
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ngrok-engine`   | Endpoint types (agent, cloud, internal), HTTP vs TCP, and Traffic Policy — the rule language, plus a reference for all 26 traffic policy actions                |
 | `ngrok-surfaces` | How to apply configuration on each surface: agent CLI and `ngrok.yml`, the Go/JavaScript/Python/Rust SDKs, the REST API, Terraform, and the Kubernetes Operator |
+
+## ngrok MCP server
+
+When the ngrok MCP server is connected, the skills use it to check your account's live state, such as endpoints, agents, and traffic, instead of asking you. The plugin installs include the server. To sign in or set it up another way, see the [ngrok MCP server docs](https://ngrok.com/docs/mcp-server).
 
 ## Usage
 
