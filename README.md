@@ -30,9 +30,7 @@ Or install as a plugin:
 
 ## ngrok MCP server
 
-The skills teach your agent how ngrok works. The ngrok MCP server (`https://mcp.ngrok.com/mcp`) lets it read your account: endpoints, connected agents, Traffic Inspector, usage, limits, and the ngrok docs ([learn more in the MCP server docs](https://ngrok.com/docs/mcp-server)). It can also validate a Traffic Policy before you apply it. When the server is connected, the skills use its tools to check live state instead of asking you. Without it, they fall back to the CLI and API.
-
-<!-- TODO(ADMIN-895): confirm the docs URL before launch. -->
+The skills teach your agent how ngrok works. The ngrok MCP server (`https://mcp.ngrok.com/mcp`) lets it read and manage your account: endpoints, connected agents, Traffic Inspector, usage, limits, and the ngrok docs ([learn more in the MCP server docs](https://ngrok.com/docs/mcp-server)). It can also validate a Traffic Policy before you apply it. When the server is connected, the skills use its tools to check live state instead of asking you. Without it, they fall back to the CLI and API. The server is available on all ngrok plans, including the free plan.
 
 - **Claude Code:**
 
@@ -45,13 +43,12 @@ The skills teach your agent how ngrok works. The ngrok MCP server (`https://mcp.
 
   ```bash
   codex mcp add ngrok --url https://mcp.ngrok.com/mcp
-  codex mcp login ngrok \
-    --scopes ship:apps:read,ship:apps:write,integrations:read,events:read,team:read,api-keys:read,ssh-credentials:read
+  codex mcp login ngrok
   ```
 
-- **Other clients:** add `https://mcp.ngrok.com/mcp` as a streamable HTTP server.
+- **Cursor and other clients:** follow the [client-specific quickstart](https://ngrok.com/docs/mcp-server). Some clients need extra OAuth configuration.
 
-Login opens a browser. Sign in to ngrok and approve the consent screen. The MCP server is in early access. [Request access](https://dashboard.ngrok.com/early-access#mcp-server) in the dashboard. No tool returns a token, key, or other secret.
+Login opens a browser. Sign in to ngrok and approve the consent screen. Access is not read-only: the agent acts as you, with your role's permissions, so check each change before you approve it. No tool returns a token, key, or other secret.
 
 This is ngrok's own MCP server. To put _your_ MCP server behind ngrok, use the `run-mcp-gateway` skill.
 
