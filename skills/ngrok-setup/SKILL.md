@@ -1,61 +1,49 @@
 ---
 name: ngrok-setup
-description: Get authenticated and ready to use ngrok on whatever surface the task needs - agent CLI, an SDK, or infrastructure-as-code. Detects what is already installed, walks the one-time authtoken step, and routes to the right surface. Use before other ngrok tasks, or whenever an ngrok command fails with an authentication or configuration error. Use when the user says "set up ngrok", "install ngrok", "add my authtoken", "ngrok isn't authenticated", "getting an auth error from ngrok", or "connect the ngrok MCP server".
+description: Set up ngrok for the user's task, including connecting an AI client to ngrok's hosted MCP server or configuring the CLI, SDK, REST API, Terraform, or Kubernetes Operator. Use for "set up ngrok", "set up ngrok MCP", "connect ngrok to my agent", authtoken setup, or auth and configuration errors. For exposing the user's own MCP server, use run-mcp-gateway.
 license: MIT
 metadata:
   author: ngrok
   version: "1.0"
   category: setup
   surface: job
-compatibility: Requires the ngrok CLI, an ngrok SDK, or an ngrok API key, depending on the surface chosen.
+compatibility: Requires access to the chosen AI client or ngrok surface; the CLI is not required to connect the hosted MCP server.
 ---
 
 # Set up ngrok
 
-Get the user authenticated and pointed at the right surface. Every ngrok action requires an authtoken (agent/SDK) or an API key (IaC) - there is no unauthenticated mode; this is deliberate abuse prevention.
+Set up the surface the user needs for the task. Check what is already working, then complete only the missing steps. An agent authtoken, an API key, and a hosted MCP connection serve different purposes.
 
-## 1. Figure out the surface
+## 1. Choose the path
 
-Pick from what the user is doing, then defer the how-to to that surface skill:
-`ngrok-surfaces` carries the routing table and the per-surface mechanics - read it off the user's project rather than asking. In short: a terminal means the agent CLI, an ngrok dependency in a manifest means the SDK, `*.tf` or k8s manifests mean infrastructure-as-code, and a controlplane provisioning per-tenant resources means the REST API.
+| User's goal | Path |
+| --- | --- |
+| Connect an AI client to ngrok's own MCP server for live account data or account changes | Hosted MCP below |
+| Put an MCP server they are building online with ngrok | `run-mcp-gateway` |
+| Expose a local service or start an endpoint from this machine | Agent CLI or SDK below |
+| Manage resources from Terraform, Kubernetes, or a controlplane | API key below; see `ngrok-surfaces` |
 
-If it is not obvious, the terminal path is the safe default for one-off tasks.
+Infer the path from the request and project. If "set up ngrok" has no clearer goal, briefly offer local tunnels, agent skills, and hosted MCP as options. Do not treat them as prerequisites for one another.
 
-## 2. Authenticate
+## 2. Set up the selected path
 
-**CLI / SDK (authtoken):**
-1. Check for an existing token: `ngrok config check`, and check the `NGROK_AUTHTOKEN` env var.
-2. If none is set, **have the user set it themselves - do not ask them to paste the token to you.** Give them the link and the exact command to run:
+**Hosted MCP (OAuth for supported clients):** Check whether the current AI client already has ngrok connected and its tools available. If not, read the current [ngrok MCP quickstart](https://ngrok.com/docs/mcp-server), identify the client and the machine or cloud environment that runs it, then follow that client's instructions for `https://mcp.ngrok.com/mcp`. Run setup steps you can perform; the user completes browser sign-in and consent. Never substitute a CLI authtoken or API key for MCP authentication. If the client cannot use OAuth, follow the quickstart's personal access token (PAT) path and have the user put the PAT in the client's secret storage, never in chat. The server is invite-only; if access is denied after sign-in, point the user to the [access request](https://dashboard.ngrok.com/early-access#mcp-server). Verify that the client sees ngrok tools and can identify the signed-in account. The MCP can make account changes under the user's permissions, so preserve the client's approval prompts.
 
-   > Grab your authtoken from https://dashboard.ngrok.com/get-started/your-authtoken, then run:
-   > `ngrok config add-authtoken <YOUR_TOKEN>`
+**Agent CLI or SDK (authtoken):** Check whether the CLI or project SDK is present and configured. For the CLI, run `ngrok config check` and check whether `NGROK_AUTHTOKEN` is set without printing its value. If an authtoken is missing, send the user to [Your Authtoken](https://dashboard.ngrok.com/get-started/your-authtoken) and have them run `ngrok config add-authtoken <YOUR_TOKEN>` themselves. On a headless host, they can set `NGROK_AUTHTOKEN` through their secret store. Do not ask them to paste it into chat. Recheck the configuration, then return to the requested task. Use `ngrok-surfaces` for SDK-specific setup.
 
-   On a headless box, or where the token comes from a secret store, `export NGROK_AUTHTOKEN=<YOUR_TOKEN>` in their environment does the same job.
-3. Tell them to say when it is done, then re-run `ngrok config check` to confirm and carry on with the original task. Run every *other* ngrok command yourself - the authtoken is the one step that stays with the user.
+**Terraform, Kubernetes Operator, or REST API (API key):** These surfaces use an [API key](https://dashboard.ngrok.com/api-keys); the Operator also needs an authtoken. Have the user configure the credential in the provider, Operator, or `NGROK_API_KEY`, without pasting it into chat. Use `ngrok-surfaces` for the chosen surface and confirm access with a read before making changes.
 
-**IaC and the REST API (API key):** Terraform, the operator, and `api.ngrok.com` authenticate with an ngrok API key (the operator needs an API key *and* an authtoken), not the agent authtoken. Point the user to https://dashboard.ngrok.com/api-keys and have them set it as the provider/operator credential or `NGROK_API_KEY`. See `ngrok-surfaces`.
+## 3. Offer the other capabilities when useful
 
-The two credentials are not interchangeable and have very different blast radii: an API key administers the account, an authtoken only starts agent sessions. If a call fails with an auth error, check which one is in play before rotating anything.
+For a broad request such as "set up ngrok for my coding agent", explain the optional sequence and skip what is already working:
 
-**ngrok MCP server (OAuth):** gives you, the agent, read access to the user's account. It is a third credential, separate from both of the above. The server is at `https://mcp.ngrok.com/mcp` (streamable HTTP). If the user asks to connect it, give them the commands for their client from the [MCP server docs](https://ngrok.com/docs/mcp-server). Login is a browser step the user does themselves, like the authtoken. The server is in early access. If ngrok rejects the account after sign-in, it doesn't have access yet; the user can request it at https://dashboard.ngrok.com/early-access#mcp-server.
-<!-- TODO(ADMIN-895): confirm the docs URL before launch. -->
+1. Install and authenticate the ngrok CLI if the agent needs to start local tunnels or endpoints.
+2. [Install ngrok skills](https://ngrok.com/docs/for-agents/skills) if the user wants reusable task guidance for exposing, securing, and troubleshooting services.
+3. Connect the hosted MCP if the agent needs live account context or account-side actions.
 
-If the server is already connected, use it to check instead of asking: `platform_whoami` names the account, the caller's role, and the plan. `platform_list_authtokens` and `platform_list_api_keys` show which credentials exist and who owns them. No tool returns a secret value.
-
-## 3. Make sure the tool is present
-
-- CLI: if `ngrok` is not installed, install it (`brew install ngrok`, or the platform package). Confirm with `ngrok --help`.
-- SDK: ensure the ngrok package for the language is a project dependency; see `ngrok-surfaces`.
-- IaC: ensure the provider/operator is configured; see `ngrok-surfaces`.
-- REST API: no tool to install - confirm the key works with a read call before writing provisioning code.
-
-## 4. Hand back
-
-Once authenticated and the surface is ready, return to whatever the user actually asked for (expose a service, receive webhooks, etc.).
+The CLI, skills, and MCP can be installed independently. If the user asked for just one, complete that one first; offer the others only when they help with the user's goal.
 
 ## Notes for agents
 
-- **Never ask the user to paste an authtoken, API key, or any other secret into the chat**, and never accept one offered that way - tell them to set it themselves and continue once they confirm. A secret in a transcript has left their control: it is logged, and it is in your context for the rest of the session.
-- This is a single one-time action per machine. Frame it that way, not as a wall.
-- If a secret does end up in the conversation, do not repeat, echo, or print it. Acknowledge that it is set and move on, and suggest rotating it. The same goes for any token minted by `POST /credentials`.
-- If a later ngrok command fails with an auth error, come back here rather than retrying blindly.
+- Never ask for or echo an authtoken, API key, PAT, or secret in chat. If one appears, do not repeat it; suggest rotation.
+- When authentication fails, identify the selected surface and its credential before changing configuration or rotating a token.
