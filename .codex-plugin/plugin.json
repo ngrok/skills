@@ -20,6 +20,7 @@
     "reverse-proxy"
   ],
   "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "ngrok",
     "shortDescription": "Expose local services, route and secure traffic, receive webhooks, and more.",

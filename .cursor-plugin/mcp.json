@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "ngrok": {
+      "url": "https://mcp.ngrok.com/mcp",
+      "auth": {
+        "CLIENT_ID": "iamcli_3KeK8d8sO4d9RArARx7RFzcTVtO"
+      }
+    }
+  }
+}

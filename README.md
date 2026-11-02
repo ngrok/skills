@@ -32,6 +32,8 @@ Or install as a plugin:
 
 The skills teach your agent how ngrok works. The ngrok MCP server (`https://mcp.ngrok.com/mcp`) lets it read and manage your account: endpoints, connected agents, Traffic Inspector, usage, limits, and the ngrok docs ([learn more in the MCP server docs](https://ngrok.com/docs/mcp-server)). It can also validate a Traffic Policy before you apply it. When the server is connected, the skills use its tools to check live state instead of asking you. Without it, they fall back to the CLI and API. The server is available on all ngrok plans, including the free plan.
 
+If you installed the skills as a plugin, the server is already configured. Sign in from your client's MCP settings (in Claude Code, run `/mcp`). To add it by hand:
+
 - **Claude Code:**
 
   ```bash

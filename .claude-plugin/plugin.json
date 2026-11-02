@@ -7,5 +7,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/ngrok/skills",
-  "homepage": "https://github.com/ngrok/skills"
+  "homepage": "https://github.com/ngrok/skills",
+  "privacyPolicyUrl": "https://ngrok.com/privacy"
 }
