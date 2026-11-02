@@ -27,8 +27,9 @@ Read it off the user's project rather than asking:
 | A controlplane creating resources per tenant/sandbox/device at runtime | REST API | `references/api.md` |
 | `*.tf` files | Terraform | `references/terraform.md` |
 | `Chart.yaml`, `kustomization.yaml`, k8s manifests | Kubernetes Operator | `references/kubernetes-operator.md` |
+| The ngrok MCP is connected in this AI client and the task is account-side | Hosted MCP | [MCP quickstart](https://ngrok.com/docs/mcp-server) |
 
-If none of these is obvious, the CLI is the safe default for a one-off task.
+The hosted MCP can inspect and change account resources through its available tools, but it cannot reach a service running on this machine. Use the CLI or SDK for local tunnels, even when MCP is connected. If no signal identifies a surface, choose based on the user's goal rather than installing every surface.
 
 ## The axis that actually separates them
 
@@ -37,6 +38,7 @@ Surfaces differ by **when the resource is created and what owns its lifetime**:
 - **CLI and SDK** create it at run time, from inside the workload. It lives as long as the agent or process does.
 - **Terraform and the Operator** declare it at deploy time, for a set of endpoints known in advance and checked into a repo.
 - **The REST API** creates it at run time from outside the workload, for a set that is *not* known in advance - one per sandbox, customer, or device, with thousands of them.
+- **The hosted MCP** lets a connected AI client inspect and manage account resources using the tools the user is authorized to call. It does not run a local agent process.
 
 Terraform and the API look interchangeable and are not. "My account has these three endpoints" is Terraform. "Every sandbox gets one" is the API. See `provision-sandbox-access` for the latter.
 
@@ -46,13 +48,14 @@ A single setup often uses two: the API or Terraform provisions the public cloud 
 
 - **CLI and SDK** use an **agent authtoken** (`NGROK_AUTHTOKEN`). It starts agent sessions and nothing else.
 - **REST API, Terraform, and the Operator** use an **API key**. It administers the account. The Operator needs both.
+- **Hosted MCP** uses browser OAuth for supported clients, or a scoped PAT when the client cannot use OAuth. CLI authtokens and API keys do not authenticate it.
 
-These are not interchangeable and have very different blast radii. If a call fails with an auth error, check which credential is in play before rotating anything. See `ngrok-setup`.
+These credentials are not interchangeable. If a call fails with an auth error, check the chosen surface before rotating anything. See `ngrok-setup`.
 
 ## Notes for agents
 
 - Run the commands yourself when you have a shell; hand back the result, not instructions.
-- The ngrok MCP server is not a surface for applying configuration. Use it to check state before and after you apply: `gw_list_endpoints` or `gw_get_endpoint` to confirm the endpoint is live, and `gw_validate_traffic_policy` to check a policy (see `ngrok-engine`).
+- When the hosted MCP is connected, use it for account-side work supported by its current tool list, including checking endpoint state and validating Traffic Policy. Check the live tool list before assuming a write is available or authorized. Use the CLI or SDK for local processes.
 - Keep the policy in its own `policy.yaml` and reference it. That is what makes it portable when the user adds a second surface later, which they usually do.
 - TCP endpoints are **not** supported by the Kubernetes Operator. If the user needs TCP on k8s, surface that early rather than discovering it late.
 - Do not port config between surfaces from memory - the shapes differ enough to fail in ways that look like network problems. Read the target surface's reference file.
