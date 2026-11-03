@@ -77,3 +77,4 @@ Read only the action file you need; the whole directory is ~12k tokens and one a
 - The seven actions written out in `references/traffic-policy.md` are the ones existing job skills happen to use. They are not the interesting half - reach for the catalog whenever the task needs anything else.
 - Many actions enforce on their own (`rate-limit` returns its own 429, `verify-webhook` fails closed). Check the action's entry before adding a `deny` that duplicates it.
 - Keep the policy in its own `policy.yaml` so it survives the user adding a second surface later.
+- If the ngrok MCP server is connected, run every policy you write or edit through `gw_validate_traffic_policy` before you show or apply it. It runs the same checks as a save, including plan entitlements, and reports each problem with its line and column. Pass `endpoint_type`, `scheme`, and `binding` when the policy is for a cloud, TCP, or internal endpoint.

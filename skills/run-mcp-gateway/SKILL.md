@@ -1,6 +1,6 @@
 ---
 name: run-mcp-gateway
-description: Expose an in-development MCP (Model Context Protocol) server for remote testing against AI model providers like Claude and OpenAI, with per-provider authentication and traffic inspection. Puts a cloud endpoint in front of your local MCP server, authenticates each provider with its own bearer token via Vaults, and forwards to your server kept off the public internet. Use when the user is building or testing an MCP server and needs a remote AI client to reach it. Use when the user says "test my MCP server", "expose my MCP server to Claude", "connect my MCP server to OpenAI", or "front door for my MCP server".
+description: Expose an in-development MCP (Model Context Protocol) server for remote testing against AI model providers like Claude and OpenAI, with per-provider authentication and traffic inspection. Puts a cloud endpoint in front of your local MCP server, authenticates each provider with its own bearer token via Vaults, and forwards to your server kept off the public internet. Use when the user is building or testing an MCP server and needs a remote AI client to reach it. Use when the user says "test my MCP server", "expose my MCP server to Claude", "connect my MCP server to OpenAI", or "front door for my MCP server". Not for connecting ngrok's own MCP server - use ngrok-setup.
 license: MIT
 metadata:
   author: ngrok
@@ -67,4 +67,5 @@ Cloud endpoint (not agent) is required here: providers connect on their own sche
 ## Notes for agents
 
 - This is distinct from `expose-localhost`: it needs per-provider auth and a persistent cloud endpoint, not a plain tunnel.
+- This is for the user's own MCP server. To connect ngrok's MCP server to the user's agent, see `ngrok-setup`.
 - Don't invent the transport - use the bundled `http-transport.ts` and adapt the user's `buildServer`.

@@ -49,6 +49,10 @@ Two skills are reference material rather than tasks. The skills above load them 
 | `ngrok-engine`   | Endpoint types (agent, cloud, internal), HTTP vs TCP, and Traffic Policy — the rule language, plus a reference for all 26 traffic policy actions                |
 | `ngrok-surfaces` | How to apply configuration on each surface: agent CLI and `ngrok.yml`, the Go/JavaScript/Python/Rust SDKs, the REST API, Terraform, and the Kubernetes Operator |
 
+## ngrok MCP server
+
+When the ngrok MCP server is connected, the skills use it to check your account's live state, such as endpoints, agents, and traffic, instead of asking you. The plugin installs include the server. To sign in or set it up another way, see the [ngrok MCP server docs](https://ngrok.com/docs/mcp-server).
+
 ## Usage
 
 Skills are automatically available once installed. The agent uses them when a relevant task is detected.

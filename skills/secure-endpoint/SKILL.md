@@ -111,7 +111,7 @@ Rules run in order; stack them. Typical API-gateway front door: restrict-ips -> 
 
 ## Apply it
 
-Attach the policy on the user's surface - see `ngrok-surfaces`. Same policy body everywhere.
+Attach the policy on the user's surface - see `ngrok-surfaces`. Same policy body everywhere. If the ngrok MCP server is connected, validate the policy first (see `ngrok-engine`).
 
 ## Notes for agents
 
