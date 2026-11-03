@@ -29,7 +29,7 @@ If no stronger signal points elsewhere, use the ngrok CLI as the default for a o
 
 ## 2. Authenticate and prepare the chosen surface
 
-**Hosted ngrok MCP (OAuth or PAT):** Check whether the AI client already has ngrok connected and its tools available. If not, read the current [ngrok MCP quickstart](https://ngrok.com/docs/mcp-server), identify the client and where it runs, and follow that client's instructions for `https://mcp.ngrok.com/mcp`. Run the setup steps you can perform; the user completes browser sign-in and consent. If the client cannot use OAuth, follow the quickstart's personal access token (PAT) path and have the user configure it in the client's secret storage. An agent authtoken or API key will not authenticate the hosted MCP. Verify that the client sees ngrok tools and identifies the signed-in account; use `platform_whoami` when available. MCP tools can change account resources under the user's permissions, so preserve the client's approval prompts.
+**Hosted ngrok MCP (OAuth or PAT):** The server is available on all plans, including free. Check whether the AI client already has ngrok connected and its tools available. If not, read the current [ngrok MCP quickstart](https://ngrok.com/docs/mcp-server), identify the client and where it runs, and follow that client's instructions for `https://mcp.ngrok.com/mcp`. Run the setup steps you can perform; the user completes browser sign-in and consent. If the client cannot use OAuth, follow the quickstart's personal access token (PAT) path and have the user configure it in the client's secret storage. An agent authtoken or API key will not authenticate the hosted MCP. Verify that the client sees ngrok tools and identifies the signed-in account; use `platform_whoami` when available. MCP tools can change account resources under the user's permissions, so preserve the client's approval prompts.
 
 **ngrok CLI or SDK (agent authtoken):**
 1. Check that the ngrok CLI or project SDK is installed. If the CLI is missing, install it for the user's platform (for example, `brew install ngrok` on macOS), then confirm with `ngrok --help`. For an SDK, confirm the ngrok dependency is in the project; see `ngrok-surfaces`.
@@ -51,6 +51,7 @@ If the user requested just one capability, complete that first. Then return to t
 
 ## Notes for agents
 
+- Agent authtokens start ngrok agent sessions; API keys administer account resources; hosted MCP uses OAuth or scoped PAT access. These credentials are not interchangeable.
 - Never ask for or echo an authtoken, API key, PAT, or secret in chat. If one appears, do not repeat it; suggest rotation. MCP tools may list credential metadata, but they do not return secret values.
 - Authentication setup is usually a one-time step for a machine or client. If a later ngrok command fails with an authentication error, check the chosen surface and credential before rotating anything.
 - Run setup commands yourself when you have a shell, apart from steps that require the user to enter a secret or complete sign-in.
