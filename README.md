@@ -6,7 +6,7 @@ Skills follow the [Agent Skills](https://agentskills.io/) format, so this repo w
 
 ## Connect your agent to ngrok's MCP server
 
-Follow the [ngrok MCP quickstart](https://ngrok.com/docs/mcp-server) to connect an AI client and inspect or manage your account. The Claude Code, Cursor, and Codex plugin packages declare the server; a standalone skills install does not. Sign in through the client after installation. The CLI or an SDK starts tunnels from your machine.
+Follow the [ngrok MCP quickstart](https://ngrok.com/docs/mcp-server) to connect an AI client and inspect or manage your account. Once connected, the skills can check live endpoints, agents, and traffic instead of asking you. The Claude Code, Cursor, and Codex plugin packages include MCP connection configuration; a standalone skills install does not. Sign in through the client after installation. The ngrok CLI or an SDK starts tunnels from your machine.
 
 ## Installation
 
@@ -42,7 +42,7 @@ Or install as a plugin:
 | `run-mcp-gateway`          | Expose an MCP server under development so Claude, OpenAI, or another provider can connect to it, each with its own credential         | "Let Claude connect to my local MCP server"                                                          |
 | `provision-sandbox-access` | Give every sandbox, container, customer device, or tenant its own isolated endpoint, provisioned programmatically from a controlplane | "Each sandbox needs its own SSH access", "One endpoint per customer"                                 |
 | `troubleshoot-ngrok`       | Diagnose ngrok errors                                                                                                                 | "What does ERR_NGROK_3200 mean?", "Works on localhost, 400 through the ngrok URL"                    |
-| `ngrok-setup`              | Get authenticated and pointed at the right surface — CLI, SDK, API, or infrastructure-as-code                                         | "Set up ngrok", "ngrok says I'm not authenticated"                                                   |
+| `ngrok-setup`              | Set up and authenticate ngrok on the right surface: ngrok CLI, SDK, API, infrastructure as code, or hosted MCP                        | "Set up ngrok", "Set up ngrok MCP", "ngrok auth error"                                               |
 
 ### Supporting References
 
