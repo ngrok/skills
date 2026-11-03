@@ -25,7 +25,7 @@ Get the code. If the user has only the message, keep the exact text, with its va
 Every code has a page with its causes and fixes. Do not explain a code from memory: codes are specific, and a near guess sends the user down the wrong path.
 
 - **ngrok MCP server with `docs_get_error`:** call it with `code`, or with `message` when there is no code. If it returns several codes for one message, ask the user for the code. Do not pick one.
-- **Otherwise:** fetch `https://ngrok.com/docs/errors/err_ngrok_<code>.md`, with the code in lowercase and without the `ERR_NGROK_` prefix. For example, `ERR_NGROK_8012` is `err_ngrok_8012.md`. A 404 means the code is wrong; check it with the user.
+- **Otherwise:** if you only have a message, obtain the code from the error page or agent output, or ask the user for it; do not guess a code from the message. Once you have the code, fetch `https://ngrok.com/docs/errors/err_ngrok_<code>.md`, with the code in lowercase and without the `ERR_NGROK_` prefix. For example, `ERR_NGROK_8012` is `err_ngrok_8012.md`. A 404 means the code is wrong; check it with the user.
 
 `docs_search` does not find error pages. Do not use it for an error code.
 
