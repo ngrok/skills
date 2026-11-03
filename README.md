@@ -37,7 +37,7 @@ Or install as a plugin:
 | `receive-webhooks`         | Receive webhooks from Stripe, GitHub, and 70+ other providers, with signature verification at the edge                                | "Test Stripe webhooks locally", "One endpoint for webhooks from several providers"                   |
 | `run-mcp-gateway`          | Expose an MCP server under development so Claude, OpenAI, or another provider can connect to it, each with its own credential         | "Let Claude connect to my local MCP server"                                                          |
 | `provision-sandbox-access` | Give every sandbox, container, customer device, or tenant its own isolated endpoint, provisioned programmatically from a controlplane | "Each sandbox needs its own SSH access", "One endpoint per customer"                                 |
-| `troubleshoot-ngrok`       | Diagnose ngrok errors                                                                                                                 | "What does ERR_NGROK_3200 mean?", "Works on localhost, 400 through the ngrok URL"                    |
+| `troubleshoot-ngrok`       | Diagnose any ngrok error from its docs page and your account's live state, including the Kubernetes Operator and AI Gateway           | "What does ERR_NGROK_3200 mean?", "Works on localhost, 400 through the ngrok URL"                    |
 | `ngrok-setup`              | Get authenticated and pointed at the right surface — CLI, SDK, API, or infrastructure-as-code                                         | "Set up ngrok", "ngrok says I'm not authenticated"                                                   |
 
 ### Supporting References

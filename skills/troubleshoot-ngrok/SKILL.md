@@ -1,56 +1,79 @@
 ---
 name: troubleshoot-ngrok
-description: Diagnose and fix common ngrok errors and connection problems - offline endpoints (ERR_NGROK_3200), agent authentication and connection failures, upstream/tunnel connection refused, and Traffic Policy errors. Reads the error code and explains the specific cause and fix. Use when an ngrok URL returns an error, a tunnel won't come up, or the agent reports a connection problem. Use when the user says "ngrok says endpoint offline", "ERR_NGROK_3200", "my tunnel isn't working", "why is my ngrok URL down", or pastes an ngrok error code.
+description: Diagnose and fix ngrok errors and connection problems. Looks up the ERR_NGROK code (or the error message) in ngrok's error docs, then checks the account's live state - endpoints, agents, traffic, limits - to find the specific cause. Covers offline endpoints (ERR_NGROK_3200), upstream connection failures (ERR_NGROK_8012), agent authentication and session limits, Traffic Policy errors, TLS errors, the Kubernetes Operator, and AI Gateway requests. Use when an ngrok URL returns an error, an agent won't start or stay connected, or the user pastes an ngrok error code or message. Use when the user says "ngrok says endpoint offline", "ERR_NGROK_3200", "my tunnel isn't working", "why is my ngrok URL down", or "what does this ngrok error mean".
 license: MIT
 metadata:
   author: ngrok
-  version: "1.0"
+  version: "1.1"
   category: troubleshooting
   surface: job
-compatibility: Requires ngrok CLI installed and authenticated. Uses the ngrok MCP server for live account state when it is connected.
+compatibility: Works best with the ngrok MCP server connected, for error lookup and live account state. Without it, needs web access to ngrok.com/docs and the ngrok CLI.
 ---
 
 # Troubleshoot ngrok
 
-Diagnose a failing ngrok endpoint or agent. Work from the error code when there is one - `references/error-codes.md` has the high-frequency codes with causes and fixes.
+Diagnose a failing ngrok endpoint or agent in three steps: get the error, read its docs page, then check live state to find which cause applies.
 
-## First: get the code
+## 1. Get the error
 
-ngrok errors carry an `ERR_NGROK_####` code, on the error page or in agent output. Get it - it points straight at the cause. If there's no code, use the symptom sections below.
+ngrok errors carry an `ERR_NGROK_<code>` code. It shows on the error page in the browser, in agent output, in API responses, and in the traffic inspector. Some codes are numbers (`ERR_NGROK_8012`) and some are names (`ERR_NGROK_AGENT_NOT_FOUND`).
 
-## If the ngrok MCP server is connected
+Get the code. If the user has only the message, keep the exact text, with its values. If there is no error at all, go to [By symptom](#by-symptom-no-error).
 
-Check the account's live state yourself instead of asking the user. Look for these tools:
+## 2. Read the error's docs page
 
-- **3200 / "is anything serving this URL?"** -> `gw_get_endpoint` with the URL. If nothing serves it, no agent is connected for that URL. `gw_list_endpoints` shows what the account does serve - a near-miss URL is a common cause.
-- **Agent won't stay up, or must upgrade** -> `gw_list_agents`: connected agents, versions, and any deprecation deadline.
-- **Failed or slow requests** -> `gw_query_traffic_inspector`, then `gw_get_traffic_inspector_request` for one request. For TCP, `gw_query_connections` and `gw_get_connection`.
-- **Rate limited, or requests rejected** -> `platform_get_enforced_limits` first. `platform_get_usage` reports consumption, not caps.
-- **Traffic Policy errors** -> `gw_validate_traffic_policy` reports each problem with its line and column.
+Every code has a page with its causes and fixes. Do not explain a code from memory: codes are specific, and a near guess sends the user down the wrong path.
 
-Without the server, use the CLI and the steps below.
+- **ngrok MCP server with `docs_get_error`:** call it with `code`, or with `message` when there is no code. If it returns several codes for one message, ask the user for the code. Do not pick one.
+- **Otherwise:** fetch `https://ngrok.com/docs/errors/err_ngrok_<code>.md`, with the code in lowercase and without the `ERR_NGROK_` prefix. For example, `ERR_NGROK_8012` is `err_ngrok_8012.md`. A 404 means the code is wrong; check it with the user.
 
-## High-frequency codes
+`docs_search` does not find error pages. Do not use it for an error code.
 
-**ERR_NGROK_3200 - endpoint offline.** The URL is being visited but no agent is currently serving it. Either the agent isn't running, or it's running a *different* endpoint/URL than the one being visited. Check the agent is up, the URL matches, and (for reserved domains) that the agent is bound to that domain. This is by far the most common one, and it's often shown to *visitors* of a tunnel whose owner's agent has stopped.
+## 3. Find which cause applies
 
-**ERR_NGROK_8012 - upstream connection refused.** The agent is up and reachable, but nothing is listening on the local port/address it forwards to, or the upstream refused. Confirm the local service is running on exactly the port the endpoint forwards to.
+An error page lists the possible causes. Check the account to find the one that applies, instead of asking the user to check each one.
 
-**Auth failures (agent won't start / authentication required).** Missing or invalid authtoken. Go to `ngrok-setup` for the token flow.
+With the ngrok MCP server:
 
-**Traffic Policy errors.** A malformed policy, an unknown action, or a bad expression. Validate the YAML against `ngrok-engine`; check the action names and config keys match; check CEL expressions.
+| Question | Tool |
+| --- | --- |
+| Is anything serving this URL? | `get_resource` with the URL. `gw_list_endpoints` shows what the account serves; a near-miss URL is a common cause. |
+| Is the agent connected, and is its version current? | `gw_list_agents`: connected agents, versions, and any deprecation deadline. |
+| What happened to this one request? | `gw_get_traffic_inspector_request` with the request ID from the ngrok error page. |
+| Which requests failed? | `gw_query_traffic_inspector`: each row carries its ngrok error code. Filter by host, status, or path. |
+| TCP or TLS endpoint failures | `gw_query_connections` (it filters by error code), then `gw_get_connection`. |
+| Is the account at a limit? | `platform_get_enforced_limits`. `platform_get_usage` reports consumption, not caps. |
+| Is the Traffic Policy valid? | `gw_validate_traffic_policy` reports each problem with its line and column. |
 
-Others (agent session limits, TLS, DNS/reserved-domain issues) are in `references/error-codes.md`.
+Without the server, use the agent's own output (`ngrok http <port> --log stdout`), the local inspector at `http://localhost:4040`, and the [dashboard](https://dashboard.ngrok.com).
 
-## By symptom (no code)
+Then apply the fix from the page, and send the failing request again to confirm.
 
-- **URL loads an ngrok error page** -> almost always 3200 (offline) or an upstream error (8012). Check agent running, then local service running.
-- **Agent exits immediately on start** -> auth (see `ngrok-setup`) or a config-file parse error.
-- **Works locally, 400/rejected through the URL** -> host-header or allowed-hosts mismatch (common with dev servers and internal forwarding); see the host-header notes in `expose-localhost/references/TROUBLESHOOTING.md` / `run-mcp-gateway`.
-- **Policy has no effect** -> it may not be attached to the endpoint being hit; confirm attachment per the surface skill.
+## Notes on the most common codes
+
+The docs page has the full fix. These notes are what the page does not say.
+
+- **ERR_NGROK_3200 (endpoint offline).** Nothing is serving the URL that was visited. Check two things: is an agent connected, and does it serve *exactly* this URL? A different subdomain or a typo gives the same error. When a *visitor* reports 3200, the owner's agent has usually stopped. There may be nothing for the visitor to fix.
+- **ERR_NGROK_8012 (upstream connection failed).** ngrok works; the local service does not answer. Confirm the service runs on exactly the port and scheme the agent forwards to (`http` vs `https`, `localhost` vs `127.0.0.1` vs a container address).
+- **Authentication errors** (for example ERR_NGROK_4018). Missing or invalid credential. Check which credential is in play first: the agent uses an authtoken, the API and IaC use an API key. Hand off to `ngrok-setup`.
+- **Session limits** (for example ERR_NGROK_108). Another agent with the same account is already connected. `gw_list_agents` shows where it runs.
+- **Agent version too old** (ERR_NGROK_121). Upgrade the agent: `ngrok update`, or the user's package manager.
+
+## By symptom (no error)
+
+- **Works on localhost, 400 or rejected through the ngrok URL.** The app or dev server rejects the ngrok `Host` header. See `expose-localhost/references/TROUBLESHOOTING.md`. For internal endpoints, `--host-header=rewrite` (see `run-mcp-gateway`).
+- **Agent exits at once on start.** A credential problem (see `ngrok-setup`) or a config file that does not parse. Run `ngrok config check`.
+- **Traffic Policy has no effect.** The policy is not attached to the endpoint being hit, or an earlier rule ends the chain. Confirm the attachment on the user's surface (see `ngrok-surfaces`). See `ngrok-engine` for rule order.
+- **TLS or certificate errors on an ngrok domain.** First check for an incident at [status.ngrok.com](https://status.ngrok.com). If there is none, something on the user's network is likely intercepting TLS: an ISP filter, a VPN, or endpoint security software on a managed machine. Ask the user to try another network, and to compare the certificate issuer with `openssl s_client -connect <host>:443 -servername <host>`.
+
+## By product
+
+- **Kubernetes Operator.** `gw_list_kubernetes_operators` shows each registered operator, but not whether it runs; `gw_list_agents` shows the live sessions. On the cluster, read the operator pod's logs and the `status` of the ngrok resources (`kubectl describe`). See [Troubleshooting the ngrok Kubernetes Operator](https://ngrok.com/docs/gateway/k8s/guides/troubleshooting.md).
+- **AI Gateway.** Use the traffic inspector tools for the failed request. To learn why the gateway retried or moved to another provider or key, see [Debug failed requests](https://ngrok.com/docs/ai-gateway/guides/debugging.md) and [Find out why a request failed over](https://ngrok.com/docs/ai-gateway/guides/why-a-request-failed-over.md). AI Gateway codes are in its [Error Codes Reference](https://ngrok.com/docs/ai-gateway/reference/error-codes.md), and `docs_get_error` finds them too.
+- **Ship.** For a release that did not deploy or a stuck rollout, call `ship_diagnose_release`. `ship_get_release_feed` lists recent releases and their status. `ship_get_replica_logs` reads the app's container logs.
 
 ## Notes for agents
 
-- Diagnose from the code first; don't guess when the code names the cause.
-- 3200 shown to a visitor (not the developer) usually just means the owner's agent stopped - there may be nothing for *this* user to fix.
-- If the cause is auth or policy, hand to `ngrok-setup` or `ngrok-engine` rather than duplicating them here.
+- Run the checks yourself when you have the MCP server or a shell. Give the user the cause and the fix, not a list of things to check.
+- Work from the code. If the code names the cause, do not guess around it.
+- If the cause is a credential or a policy, hand off to `ngrok-setup` or `ngrok-engine`. Do not repeat their content here.
