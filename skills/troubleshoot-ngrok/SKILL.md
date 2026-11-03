@@ -1,6 +1,6 @@
 ---
 name: troubleshoot-ngrok
-description: Diagnose and fix ngrok errors and connection problems. Looks up the ERR_NGROK code (or the error message) in ngrok's error docs, then checks the account's live state - endpoints, agents, traffic, limits - to find the specific cause. Covers offline endpoints (ERR_NGROK_3200), upstream connection failures (ERR_NGROK_8012), agent authentication and session limits, Traffic Policy errors, TLS errors, the Kubernetes Operator, and AI Gateway requests. Use when an ngrok URL returns an error, an agent won't start or stay connected, or the user pastes an ngrok error code or message. Use when the user says "ngrok says endpoint offline", "ERR_NGROK_3200", "my tunnel isn't working", "why is my ngrok URL down", or "what does this ngrok error mean".
+description: Diagnose and fix ngrok errors and connection problems. Looks up the ERR_NGROK code (or the error message) in ngrok's error docs, then checks the account's live state - endpoints, agents, traffic, limits - to find the specific cause. Covers offline endpoints (ERR_NGROK_3200), upstream connection failures (ERR_NGROK_8012), agent authentication and session limits, Traffic Policy errors, and TLS errors. Use when an ngrok URL returns an error, an agent won't start or stay connected, or the user pastes an ngrok error code or message. Use when the user says "ngrok says endpoint offline", "ERR_NGROK_3200", "my tunnel isn't working", "why is my ngrok URL down", or "what does this ngrok error mean".
 license: MIT
 metadata:
   author: ngrok
@@ -57,7 +57,6 @@ The docs page has the full fix. These notes are what the page does not say.
 - **ERR_NGROK_8012 (upstream connection failed).** ngrok works; the local service does not answer. Confirm the service runs on exactly the port and scheme the agent forwards to (`http` vs `https`, `localhost` vs `127.0.0.1` vs a container address).
 - **Authentication errors** (for example ERR_NGROK_4018). Missing or invalid credential. Check which credential is in play first: the agent uses an authtoken, the API and IaC use an API key. Hand off to `ngrok-setup`.
 - **Session limits** (for example ERR_NGROK_108). Another agent with the same account is already connected. `gw_list_agents` shows where it runs.
-- **Agent version too old** (ERR_NGROK_121). Upgrade the agent: `ngrok update`, or the user's package manager.
 
 ## By symptom (no error)
 
@@ -65,12 +64,6 @@ The docs page has the full fix. These notes are what the page does not say.
 - **Agent exits at once on start.** A credential problem (see `ngrok-setup`) or a config file that does not parse. Run `ngrok config check`.
 - **Traffic Policy has no effect.** The policy is not attached to the endpoint being hit, or an earlier rule ends the chain. Confirm the attachment on the user's surface (see `ngrok-surfaces`). See `ngrok-engine` for rule order.
 - **TLS or certificate errors on an ngrok domain.** First check for an incident at [status.ngrok.com](https://status.ngrok.com). If there is none, something on the user's network is likely intercepting TLS: an ISP filter, a VPN, or endpoint security software on a managed machine. Ask the user to try another network, and to compare the certificate issuer with `openssl s_client -connect <host>:443 -servername <host>`.
-
-## By product
-
-- **Kubernetes Operator.** `gw_list_kubernetes_operators` shows each registered operator, but not whether it runs; `gw_list_agents` shows the live sessions. On the cluster, read the operator pod's logs and the `status` of the ngrok resources (`kubectl describe`). See [Troubleshooting the ngrok Kubernetes Operator](https://ngrok.com/docs/gateway/k8s/guides/troubleshooting.md).
-- **AI Gateway.** Use the traffic inspector tools for the failed request. To learn why the gateway retried or moved to another provider or key, see [Debug failed requests](https://ngrok.com/docs/ai-gateway/guides/debugging.md) and [Find out why a request failed over](https://ngrok.com/docs/ai-gateway/guides/why-a-request-failed-over.md). AI Gateway codes are in its [Error Codes Reference](https://ngrok.com/docs/ai-gateway/reference/error-codes.md), and `docs_get_error` finds them too.
-- **Ship.** For a release that did not deploy or a stuck rollout, call `ship_diagnose_release`. `ship_get_release_feed` lists recent releases and their status. `ship_get_replica_logs` reads the app's container logs.
 
 ## Notes for agents
 
