@@ -208,7 +208,11 @@ def check_docs_links() -> None:
     for f in markdown_files():
         text = f.read_text()
         for m in DOCS_URL.finditer(text):
-            found.setdefault(m.group(0).rstrip(".,"), (f, line_of(text, m.start())))
+            url = m.group(0).rstrip(".,")
+            # A template such as err_ngrok_<code>.md is not a page to check.
+            if "<" in url or "{" in url:
+                continue
+            found.setdefault(url, (f, line_of(text, m.start())))
     check_urls(found, "docs link")
 
 
