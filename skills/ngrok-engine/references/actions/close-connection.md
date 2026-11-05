@@ -15,13 +15,12 @@ None.
 ## Example
 
 ```yaml
-    on_http_request:
-    - name: "Immediately close connection"
-      expressions:
-        - req.url.path.startsWith("/dc")
-      actions:
-        - type: close-connection
-
+on_http_request:
+- name: "Immediately close connection"
+  expressions:
+    - req.url.path.startsWith("/dc")
+  actions:
+    - type: close-connection
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/close-connection>

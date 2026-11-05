@@ -17,10 +17,9 @@ Deny incoming traffic to your endpoint at the HTTP layer.
 ## Example
 
 ```yaml
-      on_tcp_connect:
-        - actions:
-            - type: deny
-
+on_tcp_connect:
+  - actions:
+      - type: deny
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/deny>

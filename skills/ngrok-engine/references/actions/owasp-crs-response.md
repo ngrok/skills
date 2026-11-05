@@ -12,8 +12,8 @@ Add OWASP CoreRuleSet to outgoing HTTP responses from your endpoints.
 
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `on_error` | string | yes | Behavior if there is an error processing rules. Must be one of either `"continue"` or `"halt"` (default `"halt"`). More information can be found in the Managing Fallback Behavior section. |
-| `process_body` | bool | no | If `true`, rules for the response body are evaluated. Default is `false`. See Body Processing for details and limitations. |
+| `on_error` | string | yes | Behavior if there is an error processing rules. Must be one of either `"continue"` or `"halt"` (default `"halt"`). For more information, see the Managing fallback behavior section. |
+| `process_body` | bool | no | If `true`, the action evaluates rules for the response body. Default is `false`. See Body processing for details and limitations. |
 | `exclude_rule_ids` | array of integers | no | List of OWASP CRS rule IDs to exclude from evaluation. The minimum value is `900000` and the maximum value is `999999`. |
 
 ## Result variables
@@ -34,12 +34,11 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_response:
-    - actions:
-        - type: owasp-crs-response
-          config:
-            on_error: halt
-
+on_http_response:
+  - actions:
+      - type: owasp-crs-response
+        config:
+          on_error: halt
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/owasp-crs-response>

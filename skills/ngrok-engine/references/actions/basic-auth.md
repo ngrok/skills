@@ -27,22 +27,21 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-      - type: "basic-auth"
-        config:
-          realm: "sample-realm"
-          credentials:
-            - "user:password1"
-            - "admin:password2"
-          enforce: true
-      - type: "custom-response"
-        config:
-          status_code: 200
-          headers:
-            content-type: "text/plain"
-          body: "Successfully Authenticated!"
-
+on_http_request:
+  - actions:
+    - type: "basic-auth"
+      config:
+        realm: "sample-realm"
+        credentials:
+          - "user:password1"
+          - "admin:password2"
+        enforce: true
+    - type: "custom-response"
+      config:
+        status_code: 200
+        headers:
+          content-type: "text/plain"
+        body: "Successfully Authenticated!"
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/basic-auth>

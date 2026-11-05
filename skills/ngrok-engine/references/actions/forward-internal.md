@@ -26,12 +26,11 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: forward-internal
-          config:
-            url: https://example.internal
-
+on_http_request:
+  - actions:
+      - type: forward-internal
+        config:
+          url: https://example.internal
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/forward-internal>

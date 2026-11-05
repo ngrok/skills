@@ -49,18 +49,17 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: openid-connect
-          config:
-            issuer_url: '{your issuer url}'
-            client_id: '{your app''s oauth client id}'
-            client_secret: '{your app''s oauth client secret}'
-            scopes:
-              - openid
-              - profile
-              - email
-
+on_http_request:
+  - actions:
+      - type: openid-connect
+        config:
+          issuer_url: '{your issuer url}'
+          client_id: '{your app''s oauth client id}'
+          client_secret: '{your app''s oauth client secret}'
+          scopes:
+            - openid
+            - profile
+            - email
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/openid-connect>

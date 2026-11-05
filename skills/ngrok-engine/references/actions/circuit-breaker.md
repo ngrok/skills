@@ -22,16 +22,15 @@ Maintain system reliability by rejecting requests when error rates exceed define
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-      - type: "circuit-breaker"
-        config:
-          error_threshold: 0
-          volume_threshold: 1
-          window_duration: "60s"
-          tripped_duration: "2m"
-          enforce: true
-
+on_http_request:
+  - actions:
+    - type: "circuit-breaker"
+      config:
+        error_threshold: 0
+        volume_threshold: 1
+        window_duration: "60s"
+        tripped_duration: "2m"
+        enforce: true
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/circuit-breaker>

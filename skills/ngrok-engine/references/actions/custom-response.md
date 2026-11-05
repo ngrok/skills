@@ -19,15 +19,14 @@ Send a custom HTTP response directly back to the client.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: custom-response
-          config:
-            status_code: 503
-            body: <html><body><h1>Service Unavailable</h1><p>Our servers are currently down for maintenance. Please check back later.</p></body></html>
-            headers:
-              content-type: text/html
-
+on_http_request:
+  - actions:
+      - type: custom-response
+        config:
+          status_code: 503
+          body: <html><body><h1>Service Unavailable</h1><p>Our servers are currently down for maintenance. Please check back later.</p></body></html>
+          headers:
+            content-type: text/html
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/custom-response>
