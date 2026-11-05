@@ -27,21 +27,20 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_response:
-    - actions:
-        - type: response-body-find-replace
-          config:
-            replacements:
-              # Redact SSN patterns
-              - from: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
-                to: "[SSN REDACTED]"
-              # Redact credit card numbers
-              - from: "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
-                to: "[CARD REDACTED]"
-              # Redact phone numbers
-              - from: "\\b\\d{3}[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b"
-                to: "[PHONE REDACTED]"
-
+on_http_response:
+  - actions:
+      - type: response-body-find-replace
+        config:
+          replacements:
+            # Redact SSN patterns
+            - from: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+              to: "[SSN REDACTED]"
+            # Redact credit card numbers
+            - from: "\\b\\d{4}[- ]?\\d{4}[- ]?\\d{4}[- ]?\\d{4}\\b"
+              to: "[CARD REDACTED]"
+            # Redact phone numbers
+            - from: "\\b\\d{3}[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b"
+              to: "[PHONE REDACTED]"
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/response-body-find-replace>

@@ -29,13 +29,12 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: redirect
-          config:
-            from: ^(https?://[^/]+)/products(.*)$
-            to: $1/store/products$2
-
+on_http_request:
+  - actions:
+      - type: redirect
+        config:
+          from: ^(https?://[^/]+)/products(.*)$
+          to: $1/store/products$2
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/redirect>

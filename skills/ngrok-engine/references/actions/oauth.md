@@ -12,7 +12,7 @@ Add OAuth login for your HTTP endpoints.
 
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `provider` | string | yes | The name of the *OAuth* identity provider to be used for authentication. |
+| `provider` | string | yes | The name of the _OAuth_ identity provider to be used for authentication. |
 | `auth_id` | string | no | Unique authentication identifier for this provider. Used to scope the session cookie and to target this provider in login and logout paths. See Special paths. |
 | `client_id` | string | no | Your OAuth app's client ID. Leave this empty if you want to use ngrok's managed application. Accepts CEL interpolation. |
 | `client_secret` | string | no | Your OAuth app's client secret. Leave this empty if you want to use a managed application. Accepts CEL interpolation. |
@@ -48,12 +48,11 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: oauth
-          config:
-            provider: google
-
+on_http_request:
+  - actions:
+      - type: oauth
+        config:
+          provider: google
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/oauth>

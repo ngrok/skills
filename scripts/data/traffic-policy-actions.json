@@ -30,7 +30,7 @@
         "object"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n      - type: \"add-headers\"\n        config:\n          headers:\n            x-client-ip: \"${conn.client_ip}\"\n",
+    "example": "on_http_request:\n  - actions:\n    - type: \"add-headers\"\n      config:\n        headers:\n          x-client-ip: \"${conn.client_ip}\"",
     "doc_phases": [
       "on_http_request",
       "on_http_response"
@@ -77,7 +77,7 @@
         "depth": 0,
         "desc": "If `false`, continue to the next action even if basic authentication failed. This is useful for handling fall-through, debugging, and testing purposes.",
         "values": [],
-        "raw": "\n  If <code>false</code>, continue to the next action even if basic authentication failed.\n\n  This is useful for handling fall-through, debugging, and testing purposes.\n"
+        "raw": "\n  If <code>false</code>, continue to the next action even if basic authentication failed. \n  \n  This is useful for handling fall-through, debugging, and testing purposes.\n"
       }
     ],
     "results": [
@@ -94,7 +94,7 @@
         "bool"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n      - type: \"basic-auth\"\n        config:\n          realm: \"sample-realm\"\n          credentials:\n            - \"user:password1\"\n            - \"admin:password2\"\n          enforce: true\n      - type: \"custom-response\"\n        config:\n          status_code: 200\n          headers:\n            content-type: \"text/plain\"\n          body: \"Successfully Authenticated!\"\n",
+    "example": "on_http_request:\n  - actions:\n    - type: \"basic-auth\"\n      config:\n        realm: \"sample-realm\"\n        credentials:\n          - \"user:password1\"\n          - \"admin:password2\"\n        enforce: true\n    - type: \"custom-response\"\n      config:\n        status_code: 200\n        headers:\n          content-type: \"text/plain\"\n        body: \"Successfully Authenticated!\"",
     "doc_phases": [
       "on_http_request"
     ],
@@ -121,7 +121,7 @@
         "depth": 0,
         "desc": "Threshold percentage of errors that must be met before requests are rejected. Must be a value between `0.0` and `1.0`.",
         "values": [],
-        "raw": "\n  Threshold percentage of errors that must be met before requests are\n  rejected.\n\n  Must be a value between `0.0` and `1.0`.\n"
+        "raw": "\n  Threshold percentage of errors that must be met before requests are\n  rejected. \n\n  Must be a value between `0.0` and `1.0`.\n"
       },
       {
         "name": "volume_threshold",
@@ -131,7 +131,7 @@
         "depth": 0,
         "desc": "Number of requests in a rolling window before checking the error threshold. Must be a number between `1` and `2,000,000,000`.",
         "values": [],
-        "raw": "\n  Number of requests in a rolling window before checking the error\n  threshold.\n\n  Must be a number between `1` and `2,000,000,000`.\n"
+        "raw": "\n  Number of requests in a rolling window before checking the error\n  threshold. \n\n  Must be a number between `1` and `2,000,000,000`.\n"
       },
       {
         "name": "window_duration",
@@ -151,7 +151,7 @@
         "depth": 0,
         "desc": "Number of seconds the system waits after rejecting a request before re-evaluating upstream health. Must be a value between `1s` and `2m`.",
         "values": [],
-        "raw": "\n  Number of seconds the system waits after rejecting a request before\n  re-evaluating upstream health.\n\n  Must be a value between `1s` and `2m`.\n"
+        "raw": "\n  Number of seconds the system waits after rejecting a request before\n  re-evaluating upstream health. \n\n  Must be a value between `1s` and `2m`.\n"
       },
       {
         "name": "num_buckets",
@@ -171,11 +171,11 @@
         "depth": 0,
         "desc": "Determines if the circuit breaker is active. If `false`, the circuit breaker never trips, and no requests are rejected.",
         "values": [],
-        "raw": "\n  Determines if the circuit breaker is active.\n\n  If `false`, the circuit breaker never trips, and no requests are rejected.\n"
+        "raw": "\n  Determines if the circuit breaker is active. \n  \n  If `false`, the circuit breaker never trips, and no requests are rejected.\n"
       }
     ],
     "results": [],
-    "example": "  on_http_request:\n    - actions:\n      - type: \"circuit-breaker\"\n        config:\n          error_threshold: 0\n          volume_threshold: 1\n          window_duration: \"60s\"\n          tripped_duration: \"2m\"\n          enforce: true\n",
+    "example": "on_http_request:\n  - actions:\n    - type: \"circuit-breaker\"\n      config:\n        error_threshold: 0\n        volume_threshold: 1\n        window_duration: \"60s\"\n        tripped_duration: \"2m\"\n        enforce: true",
     "doc_phases": [
       "on_http_request"
     ],
@@ -195,7 +195,7 @@
     "terminating": true,
     "config": [],
     "results": [],
-    "example": "    on_http_request:\n    - name: \"Immediately close connection\"\n      expressions:\n        - req.url.path.startsWith(\"/dc\")\n      actions:\n        - type: close-connection\n",
+    "example": "on_http_request:\n- name: \"Immediately close connection\"\n  expressions:\n    - req.url.path.startsWith(\"/dc\")\n  actions:\n    - type: close-connection",
     "doc_phases": [
       "on_http_request",
       "on_tcp_connect"
@@ -207,7 +207,6 @@
     "name": "Compress Response",
     "description": "Compress HTTP response bodies from your upstream server.",
     "phases": [
-      "on_http_request",
       "on_http_response"
     ],
     "categories": [
@@ -241,7 +240,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_response:\n    - expressions:\n        - \"req.url.path.startsWith('/api/')\"\n      actions:\n        - type: \"compress-response\"\n          config:\n            algorithms:\n              - \"gzip\"\n              - \"br\"\n              - \"deflate\"\n              - \"compress\"\n",
+    "example": "on_http_response:\n  - expressions:\n      - \"req.url.path.startsWith('/api/')\"\n    actions:\n      - type: \"compress-response\"\n        config:\n          algorithms:\n            - \"gzip\"\n            - \"br\"\n            - \"deflate\"\n            - \"compress\"",
     "doc_phases": [
       "on_http_response"
     ],
@@ -292,7 +291,7 @@
       }
     ],
     "results": [],
-    "example": "  on_http_request:\n    - actions:\n        - type: custom-response\n          config:\n            status_code: 503\n            body: <html><body><h1>Service Unavailable</h1><p>Our servers are currently down for maintenance. Please check back later.</p></body></html>\n            headers:\n              content-type: text/html\n",
+    "example": "on_http_request:\n  - actions:\n      - type: custom-response\n        config:\n          status_code: 503\n          body: <html><body><h1>Service Unavailable</h1><p>Our servers are currently down for maintenance. Please check back later.</p></body></html>\n          headers:\n            content-type: text/html",
     "doc_phases": [
       "on_http_request",
       "on_http_response"
@@ -304,8 +303,8 @@
     "name": "Deny",
     "description": "Deny incoming traffic to your endpoint at the HTTP layer.",
     "phases": [
-      "on_http_request",
-      "on_tcp_connect"
+      "on_tcp_connect",
+      "on_http_request"
     ],
     "categories": [
       "traffic-control",
@@ -325,7 +324,7 @@
       }
     ],
     "results": [],
-    "example": "      on_tcp_connect:\n        - actions:\n            - type: deny\n",
+    "example": "on_tcp_connect:\n  - actions:\n      - type: deny",
     "doc_phases": [
       "on_tcp_connect",
       "on_http_request"
@@ -337,8 +336,8 @@
     "name": "Forward Internal",
     "description": "Forward traffic to an internal endpoint within the same ngrok account.",
     "phases": [
-      "on_http_request",
-      "on_tcp_connect"
+      "on_tcp_connect",
+      "on_http_request"
     ],
     "categories": [
       "traffic-control",
@@ -354,7 +353,7 @@
         "depth": 0,
         "desc": "The endpoint to forward to, such as `http://my-internal-endpoint.internal:1234`.",
         "values": [],
-        "raw": "\n  <p>\n    The endpoint to forward to, such as <code>[http://my-internal-endpoint.internal:1234](http://my-internal-endpoint.internal:1234)</code>.\n  </p>\n"
+        "raw": "\n  <p>\n    The endpoint to forward to, such as <code>http://my-internal-endpoint.internal:1234</code>.\n  </p>\n"
       },
       {
         "name": "on_error",
@@ -367,7 +366,7 @@
           "`halt` (default)",
           "`continue`"
         ],
-        "raw": "\n  <p>\n    Whether or not further actions in the Traffic Policy should run if there\n    is an error.\n  </p>\n\n  <ConfigEnum>\n     \n     \n  </ConfigEnum>\n"
+        "raw": "\n  <p>\n    Whether or not further actions in the Traffic Policy should run if there\n    is an error.\n  </p>\n  <ConfigEnum>\n     \n     \n  </ConfigEnum>\n"
       }
     ],
     "results": [
@@ -384,7 +383,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: forward-internal\n          config:\n            url: https://example.internal\n",
+    "example": "on_http_request:\n  - actions:\n      - type: forward-internal\n        config:\n          url: https://example.internal",
     "doc_phases": [
       "on_tcp_connect",
       "on_http_request"
@@ -438,9 +437,9 @@
         "required": false,
         "cel": true,
         "depth": 0,
-        "desc": "A list of query parameters to append to the URL. Each item is an object with the following structure: ```yaml theme={null} - key: \"parameter_name\" value: \"parameter_value\" ``` Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars.",
+        "desc": "A list of query parameters to append to the URL. Each item is an object with the following structure: ```yaml - key: \"parameter_name\" value: \"parameter_value\" ``` Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars.",
         "values": [],
-        "raw": "\n  A list of query parameters to append to the URL. Each item is an object with the following structure:\n\n  ```yaml theme={null}\n  - key: \"parameter_name\"\n    value: \"parameter_value\"\n  ```\n\n  Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars.\n"
+        "raw": "\n  A list of query parameters to append to the URL. Each item is an object with the following structure:\n\n  ```yaml\n  - key: \"parameter_name\"\n    value: \"parameter_value\"\n  ```\n\n  Maximum: `32` entries. Key max length: `128` chars. Value max length: `8192` chars.\n"
       },
       {
         "name": "headers",
@@ -495,7 +494,7 @@
           "`last_attempt.res`: The last response object (if any)",
           "`last_attempt.error`: The error string (if any)"
         ],
-        "raw": "\n  A CEL expression evaluated after each failed attempt. If `true`, the request is retried (up to `3` times).\n\n  <ConfigEnum>\n     \n     \n     \n     \n  </ConfigEnum>\n"
+        "raw": "\n  A CEL expression evaluated after each failed attempt. If `true`, the request is retried (up to `3` times).\n\n  <ConfigEnum>\n     \n     \n     \n     \n  </ConfigEnum>\n\n"
       },
       {
         "name": "on_error",
@@ -505,8 +504,8 @@
         "depth": 0,
         "desc": "Determines how to proceed if the HTTP request fails.",
         "values": [
-          "`continue` (default) – Proceed with remaining actions",
-          "`halt` – Stop processing the policy"
+          "`continue` (default): Proceed with remaining actions",
+          "`halt`: Stop processing the policy"
         ],
         "raw": "\n  Determines how to proceed if the HTTP request fails.\n\n  <ConfigEnum>\n     \n     \n  </ConfigEnum>\n"
       }
@@ -585,7 +584,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - name: BasicInternalRequest\n      actions:\n        - type: http-request\n          config:\n            url: https://upstream-service.internal/ping\n",
+    "example": "on_http_request:\n  - name: BasicInternalRequest\n    actions:\n      - type: http-request\n        config:\n          url: https://upstream-service.internal/ping",
     "doc_phases": [
       "on_http_request",
       "on_http_response"
@@ -610,9 +609,9 @@
         "required": true,
         "cel": false,
         "depth": 0,
-        "desc": "Configuration object for the Issuer(s) of the JWTs.",
+        "desc": "Configuration object for the issuers of the JWTs.",
         "values": [],
-        "raw": "\n  Configuration object for the Issuer(s) of the JWTs.\n\n  <Expandable label=\"child properties\">\n    \n  </Expandable>\n"
+        "raw": "\n  Configuration object for the issuers of the JWTs.\n\n  <Expandable label=\"child properties\">\n    \n  </Expandable>\n"
       },
       {
         "name": "issuer.allow_list",
@@ -640,9 +639,9 @@
         "required": false,
         "cel": false,
         "depth": 0,
-        "desc": "Configuration object for the Audience(s) of the JWTs.",
+        "desc": "Configuration object for the audiences of the JWTs.",
         "values": [],
-        "raw": "\n  Configuration object for the Audience(s) of the JWTs.\n\n  <Expandable label=\"child properties\">\n    \n  </Expandable>\n"
+        "raw": "\n  Configuration object for the audiences of the JWTs.\n\n  <Expandable label=\"child properties\">\n    \n  </Expandable>\n"
       },
       {
         "name": "audience.allow_list",
@@ -712,7 +711,7 @@
           "`header`",
           "`body`"
         ],
-        "raw": "\n          Location in the request to expect the JWT.\n\n          <ConfigEnum>\n             \n             \n          </ConfigEnum>\n\n          When choosing `header`, the <code>content-type</code> header must be set to either <code>application/json</code> or <code>application/x-www-form-urlencoded</code>.\n\n          When choosing <code>body</code>, the method must be <code>POST</code>, <code>PUT</code>, or <code>PATCH</code>\n\n          Including a token as a URL query parameter is not supported.\n        "
+        "raw": "\n          Location in the request to expect the JWT.\n\n          <ConfigEnum>\n             \n             \n          </ConfigEnum>\n\n          When choosing `header`, the <code>content-type</code> header must be set to either <code>application/json</code> or <code>application/x-www-form-urlencoded</code>.\n          \n          When choosing <code>body</code>, the method must be <code>POST</code>, <code>PUT</code>, or <code>PATCH</code>\n          \n          Including a token as a URL query parameter is not supported.\n        "
       },
       {
         "name": "http.tokens[*].name",
@@ -762,7 +761,7 @@
         "depth": 1,
         "desc": "Configuration for the JWT signing keys.",
         "values": [],
-        "raw": "\n      Configuration for the JWT signing keys.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
+        "raw": "\n      Configuration for the JWT signing keys.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable> \n    "
       },
       {
         "name": "jws.keys[*].identification",
@@ -782,7 +781,7 @@
         "depth": 3,
         "desc": "List of claims present in this token. Supported values: ['kid']",
         "values": [],
-        "raw": "\n              List of claims present in this token. Supported values: \\['kid']\n            "
+        "raw": "\n              List of claims present in this token. Supported values: ['kid']\n            "
       },
       {
         "name": "jws.keys[*].sources",
@@ -843,7 +842,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: jwt-validation\n          config:\n            issuer:\n              allow_list:\n                - value: https://example.com/issuer\n            audience:\n              allow_list:\n                - value: urn:example:api\n            http:\n              tokens:\n                - type: access_token\n                  method: header\n                  name: Authorization\n                  prefix: 'Bearer '\n                - type: it+jwt\n                  method: body\n                  name: _id_token\n            jws:\n              allowed_algorithms:\n                - RS256\n                - ES256\n              keys:\n                sources:\n                  additional_jkus:\n                    - https://example.com/issuer/jku\n",
+    "example": "on_http_request:\n  - actions:\n      - type: jwt-validation\n        config:\n          issuer:\n            allow_list:\n              - value: https://example.com/issuer\n          audience:\n            allow_list:\n              - value: urn:example:api\n          http:\n            tokens:\n              - type: access_token\n                method: header\n                name: Authorization\n                prefix: 'Bearer '\n              - type: it+jwt\n                method: body\n                name: _id_token\n          jws:\n            allowed_algorithms:\n              - RS256\n              - ES256\n            keys:\n              sources:\n                additional_jkus:\n                  - https://example.com/issuer/jku",
     "doc_phases": [
       "on_http_request"
     ],
@@ -854,9 +853,9 @@
     "name": "Log",
     "description": "Add log metadata to events for logging and monitoring.",
     "phases": [
+      "on_tcp_connect",
       "on_http_request",
-      "on_http_response",
-      "on_tcp_connect"
+      "on_http_response"
     ],
     "categories": [
       "connection-modification",
@@ -871,9 +870,9 @@
         "required": true,
         "cel": true,
         "depth": 0,
-        "desc": "A key-value map of metadata that you would like to include in your events for this action.",
+        "desc": "A key-value map of metadata to include in your events for this action.",
         "values": [],
-        "raw": "\n  A key-value map of metadata that you would like to include in your events\n  for this action.\n"
+        "raw": "\n  A key-value map of metadata to include in your events for this action.\n"
       }
     ],
     "results": [
@@ -882,7 +881,7 @@
         "object"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: log\n          config:\n            metadata:\n              message: Log action executed.\n              endpoint_id: ${endpoint.id}\n",
+    "example": "on_http_request:\n  - actions:\n      - type: log\n        config:\n          metadata:\n            message: Log action executed.\n            endpoint_id: ${endpoint.id}",
     "doc_phases": [
       "on_tcp_connect",
       "on_http_request",
@@ -908,9 +907,9 @@
         "required": true,
         "cel": false,
         "depth": 0,
-        "desc": "The name of the *OAuth* identity provider to be used for authentication.",
+        "desc": "The name of the _OAuth_ identity provider to be used for authentication.",
         "values": [],
-        "raw": "\n  The name of the *OAuth* identity provider to be used for authentication.\n"
+        "raw": "\n\tThe name of the _OAuth_ identity provider to be used for authentication.\n"
       },
       {
         "name": "auth_id",
@@ -920,7 +919,7 @@
         "depth": 0,
         "desc": "Unique authentication identifier for this provider. Used to scope the session cookie and to target this provider in login and logout paths. See Special paths.",
         "values": [],
-        "raw": "\n  Unique authentication identifier for this provider.\n  Used to scope the session cookie and to target this provider in login and logout paths.\n  See [Special paths](#special-paths).\n"
+        "raw": "\n\tUnique authentication identifier for this provider.\n\tUsed to scope the session cookie and to target this provider in login and logout paths.\n\tSee [Special paths](#special-paths).\n"
       },
       {
         "name": "client_id",
@@ -930,7 +929,7 @@
         "depth": 0,
         "desc": "Your OAuth app's client ID. Leave this empty if you want to use ngrok's managed application.",
         "values": [],
-        "raw": "\n  Your OAuth app's client ID.\n\n  <Note>\n    Leave this empty if you want to use ngrok's managed application.\n  </Note>\n"
+        "raw": "\n\tYour OAuth app's client ID.\n\t<Note>\n\t\tLeave this empty if you want to use ngrok's managed application.\n\t</Note>\n"
       },
       {
         "name": "client_secret",
@@ -940,7 +939,7 @@
         "depth": 0,
         "desc": "Your OAuth app's client secret. Leave this empty if you want to use a managed application.",
         "values": [],
-        "raw": "\n  Your OAuth app's client secret.\n\n  <Note>\n    Leave this empty if you want to use a managed application.\n  </Note>\n"
+        "raw": "\n\tYour OAuth app's client secret.\n\t<Note>\n\t\tLeave this empty if you want to use a managed application.\n\t</Note>\n"
       },
       {
         "name": "scopes",
@@ -950,7 +949,7 @@
         "depth": 0,
         "desc": "A list of additional scopes to request when users authenticate with the identity provider.",
         "values": [],
-        "raw": "\n  A list of additional scopes to request when users authenticate with the identity provider.\n"
+        "raw": "\n\tA list of additional scopes to request when users authenticate with the identity provider.\n"
       },
       {
         "name": "authz_url_params",
@@ -960,7 +959,7 @@
         "depth": 0,
         "desc": "A map of additional URL parameters to apply to the authorization endpoint URL.",
         "values": [],
-        "raw": "\n  A map of additional URL parameters to apply to the authorization endpoint URL.\n"
+        "raw": "\n\tA map of additional URL parameters to apply to the authorization endpoint URL.\n"
       },
       {
         "name": "max_session_duration",
@@ -970,7 +969,7 @@
         "depth": 0,
         "desc": "Defines the maximum lifetime of a session regardless of activity.",
         "values": [],
-        "raw": "\n  Defines the maximum lifetime of a session regardless of activity.\n"
+        "raw": "\n\tDefines the maximum lifetime of a session regardless of activity.\n"
       },
       {
         "name": "idle_session_timeout",
@@ -980,7 +979,7 @@
         "depth": 0,
         "desc": "Defines the period of inactivity after which a user's session is automatically ended, requiring re-authentication.",
         "values": [],
-        "raw": "\n  Defines the period of inactivity after which a user's session is automatically ended, requiring re-authentication.\n"
+        "raw": "\n\tDefines the period of inactivity after which a user's session is automatically ended, requiring re-authentication.\n"
       },
       {
         "name": "userinfo_refresh_interval",
@@ -990,7 +989,7 @@
         "depth": 0,
         "desc": "How often should ngrok refresh data about the authenticated user from the identity provider.",
         "values": [],
-        "raw": "\n  How often should ngrok refresh data about the authenticated user from the identity provider.\n"
+        "raw": "\n\tHow often should ngrok refresh data about the authenticated user from the identity provider.\n"
       },
       {
         "name": "allow_cors_preflight",
@@ -1000,7 +999,7 @@
         "depth": 0,
         "desc": "Allow CORS preflight requests to bypass authentication checks. Enable this if the endpoint needs to be accessible via CORS.",
         "values": [],
-        "raw": "\n  Allow CORS preflight requests to bypass authentication checks.\n  Enable this if the endpoint needs to be accessible via CORS.\n"
+        "raw": "\n\tAllow CORS preflight requests to bypass authentication checks.\n\tEnable this if the endpoint needs to be accessible via CORS.\n"
       },
       {
         "name": "auth_cookie_domain",
@@ -1010,7 +1009,7 @@
         "depth": 0,
         "desc": "Sets the allowed domain for the auth cookie.",
         "values": [],
-        "raw": "\n  Sets the allowed domain for the auth cookie.\n"
+        "raw": "\n\tSets the allowed domain for the auth cookie.\n"
       }
     ],
     "results": [
@@ -1079,7 +1078,7 @@
         "boolean"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: oauth\n          config:\n            provider: google\n",
+    "example": "on_http_request:\n  - actions:\n      - type: oauth\n        config:\n          provider: google",
     "doc_phases": [
       "on_http_request"
     ],
@@ -1105,7 +1104,7 @@
         "depth": 0,
         "desc": "The base URL of the Open ID provider that serves an OpenID Provider Configuration Document at `/.well-known/openid-configuration`.",
         "values": [],
-        "raw": "\n  The base URL of the Open ID provider that serves an OpenID Provider\n  Configuration Document at `/.well-known/openid-configuration`.\n"
+        "raw": "\n\tThe base URL of the Open ID provider that serves an OpenID Provider\n\tConfiguration Document at `/.well-known/openid-configuration`.\n"
       },
       {
         "name": "auth_id",
@@ -1115,7 +1114,7 @@
         "depth": 0,
         "desc": "Unique authentication identifier for this provider. Used to scope the session cookie and to target this provider in login and logout paths. See Special paths.",
         "values": [],
-        "raw": "\n  Unique authentication identifier for this provider.\n  Used to scope the session cookie and to target this provider in login and logout paths.\n  See [Special paths](#special-paths).\n"
+        "raw": "\n\tUnique authentication identifier for this provider.\n\tUsed to scope the session cookie and to target this provider in login and logout paths.\n\tSee [Special paths](#special-paths).\n"
       },
       {
         "name": "client_id",
@@ -1125,7 +1124,7 @@
         "depth": 0,
         "desc": "Your OpenID Connect app's client ID.",
         "values": [],
-        "raw": "\n  Your OpenID Connect app's client ID.\n"
+        "raw": "\n\tYour OpenID Connect app's client ID.\n"
       },
       {
         "name": "client_secret",
@@ -1135,7 +1134,7 @@
         "depth": 0,
         "desc": "Your OpenID Connect app's client secret.",
         "values": [],
-        "raw": "\n  Your OpenID Connect app's client secret.\n"
+        "raw": "\n\tYour OpenID Connect app's client secret.\n"
       },
       {
         "name": "scopes",
@@ -1145,7 +1144,7 @@
         "depth": 0,
         "desc": "A list of additional scopes to request when users authenticate with the identity provider.",
         "values": [],
-        "raw": "\n  A list of additional scopes to request when users authenticate with the\n  identity provider.\n"
+        "raw": "\n\tA list of additional scopes to request when users authenticate with the\n\tidentity provider.\n"
       },
       {
         "name": "authz_url_params",
@@ -1155,7 +1154,7 @@
         "depth": 0,
         "desc": "A map of additional URL parameters to apply to the authorization endpoint URL.",
         "values": [],
-        "raw": "\n  A map of additional URL parameters to apply to the authorization endpoint\n  URL.\n"
+        "raw": "\n\tA map of additional URL parameters to apply to the authorization endpoint\n\tURL.\n"
       },
       {
         "name": "max_session_duration",
@@ -1165,7 +1164,7 @@
         "depth": 0,
         "desc": "Defines the maximum lifetime of a session regardless of activity.",
         "values": [],
-        "raw": "\n  Defines the maximum lifetime of a session regardless of activity.\n"
+        "raw": "\n\tDefines the maximum lifetime of a session regardless of activity.\n"
       },
       {
         "name": "idle_session_duration",
@@ -1175,7 +1174,7 @@
         "depth": 0,
         "desc": "Defines the period of inactivity after which a user's session is automatically ended, requiring re-authentication.",
         "values": [],
-        "raw": "\n  Defines the period of inactivity after which a user's session is\n  automatically ended, requiring re-authentication.\n"
+        "raw": "\n\tDefines the period of inactivity after which a user's session is\n\tautomatically ended, requiring re-authentication.\n"
       },
       {
         "name": "userinfo_refresh_interval",
@@ -1185,7 +1184,7 @@
         "depth": 0,
         "desc": "How often should ngrok refresh data about the authenticated user from the identity provider.",
         "values": [],
-        "raw": "\n  How often should ngrok refresh data about the authenticated user from the\n  identity provider.\n"
+        "raw": "\n\tHow often should ngrok refresh data about the authenticated user from the\n\tidentity provider.\n"
       },
       {
         "name": "allow_cors_preflight",
@@ -1195,7 +1194,7 @@
         "depth": 0,
         "desc": "Allow CORS preflight requests to bypass authentication checks. Enable if the endpoint needs to be accessible via CORS.",
         "values": [],
-        "raw": "\n  Allow CORS preflight requests to bypass authentication checks. Enable if\n  the endpoint needs to be accessible via CORS.\n"
+        "raw": "\n\tAllow CORS preflight requests to bypass authentication checks. Enable if\n\tthe endpoint needs to be accessible via CORS.\n"
       },
       {
         "name": "auth_cookie_domain",
@@ -1205,7 +1204,7 @@
         "depth": 0,
         "desc": "Sets the allowed domain for the auth cookie.",
         "values": [],
-        "raw": "\n  Sets the allowed domain for the auth cookie.\n"
+        "raw": "\n\tSets the allowed domain for the auth cookie.\n"
       }
     ],
     "results": [
@@ -1278,7 +1277,7 @@
         "boolean"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: openid-connect\n          config:\n            issuer_url: '{your issuer url}'\n            client_id: '{your app''s oauth client id}'\n            client_secret: '{your app''s oauth client secret}'\n            scopes:\n              - openid\n              - profile\n              - email\n",
+    "example": "on_http_request:\n  - actions:\n      - type: openid-connect\n        config:\n          issuer_url: '{your issuer url}'\n          client_id: '{your app''s oauth client id}'\n          client_secret: '{your app''s oauth client secret}'\n          scopes:\n            - openid\n            - profile\n            - email",
     "doc_phases": [
       "on_http_request"
     ],
@@ -1286,7 +1285,7 @@
   },
   {
     "type": "owasp-crs-request",
-    "name": "OWASP/CRS Request",
+    "name": "OWASP CRS Request",
     "description": "Add OWASP CoreRuleSet to incoming HTTP requests to your endpoints.",
     "phases": [
       "on_http_request"
@@ -1304,9 +1303,9 @@
         "required": true,
         "cel": false,
         "depth": 0,
-        "desc": "Behavior if there is an error processing rules. Must be one of either `\"continue\"` or `\"halt\"` (default `\"halt\"`). More information can be found in the Managing Fallback Behavior section.",
+        "desc": "Behavior if there is an error processing rules. Must be one of either `\"continue\"` or `\"halt\"` (default `\"halt\"`). For more information, see the Managing fallback behavior section.",
         "values": [],
-        "raw": "\n  <p>Behavior if there is an error processing rules. Must be one of either <code>\"continue\"</code> or <code>\"halt\"</code> (default <code>\"halt\"</code>).</p>\n  <p>More information can be found in the [Managing Fallback Behavior](#managing-fallback-behavior-on-error) section.</p>\n"
+        "raw": "\n    <p>Behavior if there is an error processing rules.\n    Must be one of either <code>\"continue\"</code> or <code>\"halt\"</code> (default <code>\"halt\"</code>).</p>\n    <p>For more information, see the [Managing fallback behavior](#managing-fallback-behavior-on-error) section.</p>\n"
       },
       {
         "name": "process_body",
@@ -1314,9 +1313,9 @@
         "required": false,
         "cel": false,
         "depth": 0,
-        "desc": "If `true`, rules for the request body are evaluated. Default is `false`. See Body Processing for details and limitations.",
+        "desc": "If `true`, the action evaluates rules for the request body. Default is `false`. See Body processing for details and limitations.",
         "values": [],
-        "raw": "\n  <p>If <code>true</code>, rules for the request body are evaluated. Default is <code>false</code>.</p>\n  <p>See [Body Processing](#body-processing) for details and limitations.</p>\n"
+        "raw": "\n    <p>If <code>true</code>, the action evaluates rules for the request body.\n    Default is <code>false</code>.</p>\n    <p>See [Body processing](#body-processing) for details and limitations.</p>\n"
       },
       {
         "name": "exclude_rule_ids",
@@ -1326,7 +1325,7 @@
         "depth": 0,
         "desc": "List of OWASP CRS rule IDs to exclude from evaluation. The minimum value is `900000` and the maximum value is `999999`.",
         "values": [],
-        "raw": "\n  <p>List of OWASP CRS rule IDs to exclude from evaluation.</p>\n  <p>The minimum value is <code>900000</code> and the maximum value is <code>999999</code>.</p>\n"
+        "raw": "\n    <p>List of OWASP CRS rule IDs to exclude from evaluation.</p>\n    <p>The minimum value is <code>900000</code> and the maximum value is <code>999999</code>.</p>\n"
       }
     ],
     "results": [
@@ -1371,7 +1370,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: owasp-crs-request\n          config:\n            on_error: halt\n",
+    "example": "on_http_request:\n  - actions:\n      - type: owasp-crs-request\n        config:\n          on_error: halt",
     "doc_phases": [
       "on_http_request"
     ],
@@ -1379,7 +1378,7 @@
   },
   {
     "type": "owasp-crs-response",
-    "name": "OWASP/CRS Response",
+    "name": "OWASP CRS Response",
     "description": "Add OWASP CoreRuleSet to outgoing HTTP responses from your endpoints.",
     "phases": [
       "on_http_response"
@@ -1397,9 +1396,9 @@
         "required": true,
         "cel": false,
         "depth": 0,
-        "desc": "Behavior if there is an error processing rules. Must be one of either `\"continue\"` or `\"halt\"` (default `\"halt\"`). More information can be found in the Managing Fallback Behavior section.",
+        "desc": "Behavior if there is an error processing rules. Must be one of either `\"continue\"` or `\"halt\"` (default `\"halt\"`). For more information, see the Managing fallback behavior section.",
         "values": [],
-        "raw": "\n  <p>Behavior if there is an error processing rules. Must be one of either <code>\"continue\"</code> or <code>\"halt\"</code> (default <code>\"halt\"</code>).</p>\n  <p>More information can be found in the [Managing Fallback Behavior](#managing-fallback-behavior-on-error) section.</p>\n"
+        "raw": "\n        <p>Behavior if there is an error processing rules.\n        Must be one of either <code>\"continue\"</code> or <code>\"halt\"</code> (default <code>\"halt\"</code>).</p>\n        <p>For more information, see the [Managing fallback behavior](#managing-fallback-behavior-on-error) section.</p>\n    "
       },
       {
         "name": "process_body",
@@ -1407,9 +1406,9 @@
         "required": false,
         "cel": false,
         "depth": 0,
-        "desc": "If `true`, rules for the response body are evaluated. Default is `false`. See Body Processing for details and limitations.",
+        "desc": "If `true`, the action evaluates rules for the response body. Default is `false`. See Body processing for details and limitations.",
         "values": [],
-        "raw": "\n  <p>If <code>true</code>, rules for the response body are evaluated. Default is <code>false</code>.</p>\n  <p>See [Body Processing](#body-processing) for details and limitations.</p>\n"
+        "raw": "\n        <p>If <code>true</code>, the action evaluates rules for the response body.\n        Default is <code>false</code>.</p>\n        <p>See [Body processing](#body-processing) for details and limitations.</p>\n    "
       },
       {
         "name": "exclude_rule_ids",
@@ -1419,7 +1418,7 @@
         "depth": 0,
         "desc": "List of OWASP CRS rule IDs to exclude from evaluation. The minimum value is `900000` and the maximum value is `999999`.",
         "values": [],
-        "raw": "\n  <p>List of OWASP CRS rule IDs to exclude from evaluation.</p>\n  <p>The minimum value is <code>900000</code> and the maximum value is <code>999999</code>.</p>\n"
+        "raw": "\n        <p>List of OWASP CRS rule IDs to exclude from evaluation.</p>\n        <p>The minimum value is <code>900000</code> and the maximum value is <code>999999</code>.</p>\n    "
       }
     ],
     "results": [
@@ -1464,7 +1463,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_response:\n    - actions:\n        - type: owasp-crs-response\n          config:\n            on_error: halt\n",
+    "example": "on_http_response:\n  - actions:\n      - type: owasp-crs-response\n        config:\n          on_error: halt",
     "doc_phases": [
       "on_http_response"
     ],
@@ -1491,7 +1490,7 @@
         "depth": 0,
         "desc": "A name for this rate limit configuration. Must be less than `1024` characters.",
         "values": [],
-        "raw": "\n  <p>A name for this rate limit configuration. Must be less than <code>1024</code> characters.</p>\n"
+        "raw": "\n        <p>A name for this rate limit configuration. Must be less than <code>1024</code> characters.</p>\n    "
       },
       {
         "name": "enforce",
@@ -1501,7 +1500,7 @@
         "depth": 0,
         "desc": "Controls whether the rate limit is actively applied at runtime. When enabled, requests exceeding the limit are blocked or throttled as configured. When disabled, the system evaluates the rate limit but does not enforce it, allowing you to test configurations, gather metrics, or return a custom response. The default value is `true`.",
         "values": [],
-        "raw": "\n  <p>Controls whether the rate limit is actively applied at runtime. When enabled, requests exceeding the limit are blocked or throttled as configured. When disabled, the system evaluates the rate limit but does not enforce it, allowing you to test configurations, gather metrics, or return a custom response.</p>\n  <p>The default value is <code>true</code>.</p>\n"
+        "raw": "\n        <p>Controls whether the rate limit is actively applied at runtime. When enabled, requests exceeding the limit are blocked or throttled as configured. When disabled, the system evaluates the rate limit but does not enforce it, allowing you to test configurations, gather metrics, or return a custom response.</p>\n        <p>The default value is <code>true</code>.</p>\n    "
       },
       {
         "name": "algorithm",
@@ -1513,7 +1512,7 @@
         "values": [
           "`sliding_window`"
         ],
-        "raw": "\n  <p>The rate limit algorithm to be used.</p>\n\n  <ConfigEnum label=\"Supported values\">\n     \n  </ConfigEnum>\n"
+        "raw": "\n        <p>The rate limit algorithm to be used.</p>\n        <ConfigEnum label=\"Supported values\">\n             \n        </ConfigEnum>\n    "
       },
       {
         "name": "capacity",
@@ -1523,7 +1522,7 @@
         "depth": 0,
         "desc": "The maximum number of requests allowed to reach your upstream server. The minimum capacity is `1` and the maximum capacity is `2,000,000,000`.",
         "values": [],
-        "raw": "\n  <p>The maximum number of requests allowed to reach your upstream server.</p>\n  <p>The minimum capacity is <code>1</code> and the maximum capacity is <code>2,000,000,000</code>.</p>\n"
+        "raw": "\n        <p>The maximum number of requests allowed to reach your upstream server.</p>\n        <p>The minimum capacity is <code>1</code> and the maximum capacity is <code>2,000,000,000</code>.</p>\n    "
       },
       {
         "name": "rate",
@@ -1533,7 +1532,7 @@
         "depth": 0,
         "desc": "The duration in which events may be limited based on the current capacity. Must be specified as a time duration that is a multiple of ten seconds (for example, `\"90s\"`, `\"10m\"`). The minimum value is `\"60s\"` and the maximum value is `\"24h\"`.",
         "values": [],
-        "raw": "\n  <p>The duration in which events may be limited based on the current capacity. Must be specified as a time duration that is a multiple of ten seconds (for example, <code>\"90s\"</code>, <code>\"10m\"</code>).</p>\n  <p>The minimum value is <code>\"60s\"</code> and the maximum value is <code>\"24h\"</code>.</p>\n"
+        "raw": "\n        <p>The duration in which events may be limited based on the current capacity. Must be specified as a time duration that is a multiple of ten seconds (for example, <code>\"90s\"</code>, <code>\"10m\"</code>).</p>\n        <p>The minimum value is <code>\"60s\"</code> and the maximum value is <code>\"24h\"</code>.</p>\n    "
       },
       {
         "name": "bucket_key",
@@ -1547,7 +1546,7 @@
           "`conn.client_ip` - The client IP address.",
           "`getReqHeader('X-Example-Header-Name')` - The value for the specified header key, if it exists."
         ],
-        "raw": "\n  <p>The elements of this collection define the unique key of a request to track the rate at which the capacity is being met.</p>\n  <p>Each bucket key is a CEL expression which includes all valid Traffic Policy [variables](/docs/gateway/traffic-policy/variables/) and [macros](/docs/gateway/traffic-policy/macros/).</p>\n\n  <ConfigEnum label=\"Sample buckets\">\n     \n     \n     \n  </ConfigEnum>\n\n  <p>Up to ten bucket keys can be specified. For multiple buckets, the action will rate limit by each unique combination of buckets.</p>\n"
+        "raw": "\n        <p>The elements of this collection define the unique key of a request to track the rate at which the capacity is being met.</p>\n        <p>Each bucket key is a CEL expression which includes all valid Traffic Policy [variables](/gateway/traffic-policy/variables/) and [macros](/gateway/traffic-policy/macros/).</p>\n        <ConfigEnum label=\"Sample buckets\">\n             \n             \n             \n        </ConfigEnum>\n        <p>Up to ten bucket keys can be specified. For multiple buckets, the action will rate limit by each unique combination of buckets.</p>\n    "
       }
     ],
     "results": [
@@ -1568,7 +1567,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: rate-limit\n          config:\n            name: Only allow 30 requests per minute\n            algorithm: sliding_window\n            capacity: 30\n            rate: 60s\n            bucket_key:\n              - 'hasReqHeader(''host'') ? getReqHeader(''host'')[0] : ''unknown'''\n",
+    "example": "on_http_request:\n  - actions:\n      - type: rate-limit\n        config:\n          name: Only allow 30 requests per minute\n          algorithm: sliding_window\n          capacity: 30\n          rate: 60s\n          bucket_key:\n            - 'hasReqHeader(''host'') ? getReqHeader(''host'')[0] : ''unknown'''",
     "doc_phases": [
       "on_http_request"
     ],
@@ -1645,7 +1644,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: redirect\n          config:\n            from: ^(https?://[^/]+)/products(.*)$\n            to: $1/store/products$2\n",
+    "example": "on_http_request:\n  - actions:\n      - type: redirect\n        config:\n          from: ^(https?://[^/]+)/products(.*)$\n          to: $1/store/products$2",
     "doc_phases": [
       "on_http_request"
     ],
@@ -1682,7 +1681,7 @@
         "array of strings"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: remove-headers\n          config:\n            headers:\n              - x-client-version\n              - x-trace-id\n",
+    "example": "on_http_request:\n  - actions:\n      - type: remove-headers\n        config:\n          headers:\n            - x-client-version\n            - x-trace-id",
     "doc_phases": [
       "on_http_request",
       "on_http_response"
@@ -1746,7 +1745,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: request-body-find-replace\n          config:\n            replacements:\n              - from: '\"api_key\":\\s*\"[^\"]*\"'\n                to: '\"api_key\": \"[REDACTED]\"'\n              - from: \"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}\"\n                to: \"[EMAIL REDACTED]\"\n",
+    "example": "on_http_request:\n  - actions:\n      - type: request-body-find-replace\n        config:\n          replacements:\n            - from: '\"api_key\":\\s*\"[^\"]*\"'\n              to: '\"api_key\": \"[REDACTED]\"'\n            - from: \"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}\"\n              to: \"[EMAIL REDACTED]\"",
     "doc_phases": [
       "on_http_request"
     ],
@@ -1809,7 +1808,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_response:\n    - actions:\n        - type: response-body-find-replace\n          config:\n            replacements:\n              # Redact SSN patterns\n              - from: \"\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b\"\n                to: \"[SSN REDACTED]\"\n              # Redact credit card numbers\n              - from: \"\\\\b\\\\d{4}[- ]?\\\\d{4}[- ]?\\\\d{4}[- ]?\\\\d{4}\\\\b\"\n                to: \"[CARD REDACTED]\"\n              # Redact phone numbers\n              - from: \"\\\\b\\\\d{3}[-.\\\\s]?\\\\d{3}[-.\\\\s]?\\\\d{4}\\\\b\"\n                to: \"[PHONE REDACTED]\"\n",
+    "example": "on_http_response:\n  - actions:\n      - type: response-body-find-replace\n        config:\n          replacements:\n            # Redact SSN patterns\n            - from: \"\\\\b\\\\d{3}-\\\\d{2}-\\\\d{4}\\\\b\"\n              to: \"[SSN REDACTED]\"\n            # Redact credit card numbers\n            - from: \"\\\\b\\\\d{4}[- ]?\\\\d{4}[- ]?\\\\d{4}[- ]?\\\\d{4}\\\\b\"\n              to: \"[CARD REDACTED]\"\n            # Redact phone numbers\n            - from: \"\\\\b\\\\d{3}[-.\\\\s]?\\\\d{3}[-.\\\\s]?\\\\d{4}\\\\b\"\n              to: \"[PHONE REDACTED]\"",
     "doc_phases": [
       "on_http_response"
     ],
@@ -1820,8 +1819,9 @@
     "name": "Restrict IPs",
     "description": "Allow or deny incoming traffic based on the client IP.",
     "phases": [
+      "on_tcp_connect",
       "on_http_request",
-      "on_tcp_connect"
+      "on_http_response"
     ],
     "categories": [
       "security",
@@ -1835,9 +1835,9 @@
         "required": true,
         "cel": false,
         "depth": 0,
-        "desc": "Default true. If false, continue to the next action even if the IP is not permitted.",
+        "desc": "Default true. If false, continue to the next action even if the IP isn't permitted.",
         "values": [],
-        "raw": "\n  Default true. If false, continue to the next action even if the IP is not permitted.\n"
+        "raw": "\n  Default true.\n  If false, continue to the next action even if the IP isn't permitted.\n"
       },
       {
         "name": "allow",
@@ -1867,7 +1867,7 @@
         "depth": 0,
         "desc": "List of IP Policy identifiers to be checked if the source IP is allowed access.",
         "values": [],
-        "raw": "\n  List of [IP Policy](/docs/api-reference/ippolicies/list) identifiers to be checked if the source IP is allowed access.\n"
+        "raw": "\n  List of [IP Policy](/api-reference/ippolicies/list) identifiers to be checked if the source IP is allowed access.\n"
       }
     ],
     "results": [
@@ -1888,7 +1888,7 @@
         "string"
       ]
     ],
-    "example": "  on_tcp_connect:\n    - actions:\n        - type: restrict-ips\n          config:\n            enforce: true\n            allow:\n              - 1.1.1.1/32\n            deny:\n              - 110.0.0.0/8\n",
+    "example": "on_tcp_connect:\n  - actions:\n      - type: restrict-ips\n        config:\n          enforce: true\n          allow:\n            - 1.1.1.1/32\n          deny:\n            - 110.0.0.0/8",
     "doc_phases": [
       "on_http_request",
       "on_http_response",
@@ -1899,11 +1899,11 @@
   {
     "type": "set-vars",
     "name": "Set Vars",
-    "description": "Set custom variables for use in your traffic policy.",
+    "description": "Set custom variables for use in your Traffic Policy.",
     "phases": [
+      "on_tcp_connect",
       "on_http_request",
-      "on_http_response",
-      "on_tcp_connect"
+      "on_http_response"
     ],
     "categories": [
       "request-modification",
@@ -1918,13 +1918,13 @@
         "required": true,
         "cel": false,
         "depth": 0,
-        "desc": "List of maps that have a key of string and a value of any valid CEL type Each map must be of exactly size `1`, and represents one variable where the key is the name of the variable: ```yaml theme={null} vars: - variable_a: value - variable_b: value ```",
+        "desc": "List of maps that have a key of string and a value of any valid CEL type Each map must be of exactly size `1`, and represents one variable where the key is the name of the variable: ```yaml vars: - variable_a: value - variable_b: value ```",
         "values": [],
-        "raw": "\n  List of maps that have a key of string and a value of any valid CEL type\n\n  <Note>\n    Each map must be of exactly size `1`, and represents one variable where the\n    key is the name of the variable:\n\n    ```yaml theme={null}\n    vars:\n      - variable_a: value\n      - variable_b: value\n    ```\n  </Note>\n"
+        "raw": "\n  List of maps that have a key of string and a value of any valid CEL type\n\n  <Note>\n    Each map must be of exactly size `1`, and represents one variable where the\n    key is the name of the variable:\n    ```yaml\n    vars:\n      - variable_a: value\n      - variable_b: value\n    ```\n  </Note>\n"
       }
     ],
     "results": [],
-    "example": "  on_http_request:\n    - actions:\n        - type: set-vars\n          config:\n            vars:\n              - sample_string: bar\n              - sample_double: 1.5\n              - sample_bool: true\n              - sample_null: null\n              - sample_list:\n                  - 1\n                  - 2\n                  - 3\n              - sample_map:\n                  key: value\n              - sample_nested_map:\n                  key:\n                    - value1\n                    - value2\n    - expressions:\n        - vars.sample_bool == true\n      actions:\n        - type: custom-response\n          config:\n            status_code: 200\n            headers:\n              content-type: text/plain\n            body: ${vars.sample_string} ${vars.sample_double} ${vars.sample_list[0]} ${vars.sample_map.key} ${vars.sample_nested_map.key[1]}\n",
+    "example": "on_http_request:\n  - actions:\n      - type: set-vars\n        config:\n          vars:\n            - sample_string: bar\n            - sample_double: 1.5\n            - sample_bool: true\n            - sample_null: null\n            - sample_list:\n                - 1\n                - 2\n                - 3\n            - sample_map:\n                key: value\n            - sample_nested_map:\n                key:\n                  - value1\n                  - value2\n  - expressions:\n      - vars.sample_bool == true\n    actions:\n      - type: custom-response\n        config:\n          status_code: 200\n          headers:\n            content-type: text/plain\n          body: ${vars.sample_string} ${vars.sample_double} ${vars.sample_list[0]} ${vars.sample_map.key} ${vars.sample_nested_map.key[1]}",
     "doc_phases": [
       "on_http_request",
       "on_http_response",
@@ -1999,7 +1999,7 @@
         "string"
       ]
     ],
-    "example": "  on_event_stream_message:\n    - actions:\n        - type: sse-find-replace\n          config:\n            replacements:\n              # Redact SSN patterns in streaming content\n              - field: data\n                from: \"\\\\d{3}-\\\\d{2}-\\\\d{4}\"\n                to: \"[SSN REDACTED]\"\n              # Redact email addresses\n              - field: data\n                from: \"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}\"\n                to: \"[EMAIL REDACTED]\"\n",
+    "example": "on_event_stream_message:\n  - actions:\n      - type: sse-find-replace\n        config:\n          replacements:\n            # Redact SSN patterns in streaming content\n            - field: data\n              from: \"\\\\d{3}-\\\\d{2}-\\\\d{4}\"\n              to: \"[SSN REDACTED]\"\n            # Redact email addresses\n            - field: data\n              from: \"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}\"\n              to: \"[EMAIL REDACTED]\"",
     "doc_phases": [
       "on_event_stream_message"
     ],
@@ -2026,7 +2026,7 @@
         "depth": 0,
         "desc": "The minimum TLS version to support. Must be one of `1.2` or `1.3`.",
         "values": [],
-        "raw": "\n  The minimum TLS version to support. Must be one of `1.2` or `1.3`.\n"
+        "raw": "\n  The minimum TLS version to support.\n  Must be one of `1.2` or `1.3`.\n"
       },
       {
         "name": "max_version",
@@ -2036,7 +2036,7 @@
         "depth": 0,
         "desc": "The maximum TLS version to support. Must be one of `1.2` or `1.3`.",
         "values": [],
-        "raw": "\n  The maximum TLS version to support. Must be one of `1.2` or `1.3`.\n"
+        "raw": "\n  The maximum TLS version to support.\n  Must be one of `1.2` or `1.3`.\n"
       },
       {
         "name": "server_private_key",
@@ -2084,7 +2084,7 @@
       }
     ],
     "results": [],
-    "example": "  on_tcp_connect:\n    - actions:\n        - type: terminate-tls\n          config:\n            min_version: '1.3'\n            max_version: '1.3'\n",
+    "example": "on_tcp_connect:\n  - actions:\n      - type: terminate-tls\n        config:\n          min_version: '1.3'\n          max_version: '1.3'",
     "doc_phases": [
       "on_tcp_connect"
     ],
@@ -2110,7 +2110,7 @@
         "depth": 0,
         "desc": "A regular expression pattern used to match a part of the URL. Supports CEL Interpolation.",
         "values": [],
-        "raw": "\n  <p>A regular expression pattern used to match a part of the URL.</p>\n  <p>Supports [CEL Interpolation](/docs/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n"
+        "raw": "\n        <p>A regular expression pattern used to match a part of the URL.</p>\n        <p>Supports [CEL Interpolation](/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n    "
       },
       {
         "name": "to",
@@ -2120,7 +2120,7 @@
         "depth": 0,
         "desc": "A regular expression pattern used to replace the matched part of the URL. Supports CEL Interpolation.",
         "values": [],
-        "raw": "\n  <p>A regular expression pattern used to replace the matched part of the URL.</p>\n  <p>Supports [CEL Interpolation](/docs/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n"
+        "raw": "\n        <p>A regular expression pattern used to replace the matched part of the URL.</p>\n        <p>Supports [CEL Interpolation](/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n    "
       }
     ],
     "results": [
@@ -2141,7 +2141,7 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - expressions:\n        - req.url.path == '/products'\n      actions:\n        - type: url-rewrite\n          config:\n            from: /products\n            to: /products.php\n",
+    "example": "on_http_request:\n  - expressions:\n      - req.url.path == '/products'\n    actions:\n      - type: url-rewrite\n        config:\n          from: /products\n          to: /products.php",
     "doc_phases": [
       "on_http_request"
     ],
@@ -2167,7 +2167,7 @@
         "depth": 0,
         "desc": "The name of the provider to verify webhook requests from. Value must be a supported provider identifier. Don't see your provider? Request support for it here.",
         "values": [],
-        "raw": "\n  <p>The name of the provider to verify webhook requests from.</p>\n  <p>Value must be a [supported provider](#supported-providers) identifier. Don't see your provider? [Request support for it here](https://dashboard.ngrok.com/early-access#webhook-providers).</p>\n"
+        "raw": "\n        <p>The name of the provider to verify webhook requests from.</p>\n        <p>Value must be a [supported provider](#supported-providers) identifier.\n        Don't see your provider? [Request support for it here](https://dashboard.ngrok.com/early-access#webhook-providers).</p>\n    "
       },
       {
         "name": "secret",
@@ -2177,7 +2177,7 @@
         "depth": 0,
         "desc": "The secret key used to validate webhook requests from the specified provider. Supports CEL Interpolation.",
         "values": [],
-        "raw": "\n  <p>The secret key used to validate webhook requests from the specified provider.</p>\n  <p>Supports [CEL Interpolation](/docs/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n"
+        "raw": "\n        <p>The secret key used to validate webhook requests from the specified provider.</p>\n        <p>Supports [CEL Interpolation](/gateway/traffic-policy/how-it-works#cel-interpolation).</p>\n    "
       },
       {
         "name": "enforce",
@@ -2185,9 +2185,9 @@
         "required": false,
         "cel": false,
         "depth": 0,
-        "desc": "When `true`, the request will be halted if the webhook is not valid and no further actions will run. However when `false`, subsequent actions will run even if the webhook was not valid. Default `true`.",
+        "desc": "When `true`, ngrok halts the request if the webhook isn't valid, and no further actions run. However, when `false`, subsequent actions run even if the webhook isn't valid. Default `true`.",
         "values": [],
-        "raw": "\n  <p>When `true`, the request will be halted if the webhook is not valid and no further actions will run. However when `false`, subsequent actions will run even if the webhook was not valid.</p>\n  <p>Default <code>true</code>.</p>\n"
+        "raw": "\n        <p>When `true`, ngrok halts the request if the webhook isn't valid, and no further actions run.\n        However, when `false`, subsequent actions run even if the webhook isn't valid.</p>\n        <p>Default <code>true</code>.</p>\n    "
       }
     ],
     "results": [
@@ -2204,8 +2204,10 @@
         "string"
       ]
     ],
-    "example": "  on_http_request:\n    - actions:\n        - type: verify-webhook\n          config:\n            provider: gitlab\n            secret: secret!\n        - type: custom-response\n          config:\n            status_code: 200\n            headers:\n              content-type: text/plain\n            body: GitLab webhook verified\n",
-    "doc_phases": [],
+    "example": "on_http_request:\n  - actions:\n      - type: verify-webhook\n        config:\n          provider: gitlab\n          secret: secret!\n      - type: custom-response\n        config:\n          status_code: 200\n          headers:\n            content-type: text/plain\n          body: GitLab webhook verified",
+    "doc_phases": [
+      "on_http_request"
+    ],
     "policy_type": "verify-webhook"
   }
 ]

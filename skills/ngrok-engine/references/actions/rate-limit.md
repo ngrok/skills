@@ -45,17 +45,16 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: rate-limit
-          config:
-            name: Only allow 30 requests per minute
-            algorithm: sliding_window
-            capacity: 30
-            rate: 60s
-            bucket_key:
-              - 'hasReqHeader(''host'') ? getReqHeader(''host'')[0] : ''unknown'''
-
+on_http_request:
+  - actions:
+      - type: rate-limit
+        config:
+          name: Only allow 30 requests per minute
+          algorithm: sliding_window
+          capacity: 30
+          rate: 60s
+          bucket_key:
+            - 'hasReqHeader(''host'') ? getReqHeader(''host'')[0] : ''unknown'''
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/rate-limit>

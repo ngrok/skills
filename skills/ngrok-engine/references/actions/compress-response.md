@@ -24,18 +24,17 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_response:
-    - expressions:
-        - "req.url.path.startsWith('/api/')"
-      actions:
-        - type: "compress-response"
-          config:
-            algorithms:
-              - "gzip"
-              - "br"
-              - "deflate"
-              - "compress"
-
+on_http_response:
+  - expressions:
+      - "req.url.path.startsWith('/api/')"
+    actions:
+      - type: "compress-response"
+        config:
+          algorithms:
+            - "gzip"
+            - "br"
+            - "deflate"
+            - "compress"
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/compress-response>

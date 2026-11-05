@@ -37,7 +37,7 @@ All 26 Traffic Policy actions. This file is the index only. Each action's config
 | [`request-body-find-replace`](actions/request-body-find-replace.md) | `on_http_request` | no | Find and replace text patterns in HTTP request bodies using regular expressions. |
 | [`response-body-find-replace`](actions/response-body-find-replace.md) | `on_http_response` | no | Find and replace text patterns in HTTP response bodies using regular expressions. |
 | [`restrict-ips`](actions/restrict-ips.md) | `on_http_request` `on_http_response` `on_tcp_connect` | no | Allow or deny incoming traffic based on the client IP. |
-| [`set-vars`](actions/set-vars.md) | `on_http_request` `on_http_response` `on_tcp_connect` | no | Set custom variables for use in your traffic policy. |
+| [`set-vars`](actions/set-vars.md) | `on_http_request` `on_http_response` `on_tcp_connect` | no | Set custom variables for use in your Traffic Policy. |
 | [`sse-find-replace`](actions/sse-find-replace.md) | `on_event_stream_message` | no | Find and replace text patterns in Server-Sent Events (SSE) streams. |
 | [`terminate-tls`](actions/terminate-tls.md) | `on_tcp_connect` | no | Control the behavior of TLS termination on your endpoints. |
 | [`url-rewrite`](actions/url-rewrite.md) | `on_http_request` | no | Rewrite request URLs transparently using regular expressions. |

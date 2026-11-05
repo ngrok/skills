@@ -20,7 +20,7 @@ Send an HTTP request to a third-party API and return the response.
 | `max_redirects` | int | no | The maximum number of HTTP redirects to follow. The minimum allowed is `0`. The maximum allowed is `100`. |
 | `timeout` | duration | no | The maximum duration as a duration string to wait for the entire request (including retries and redirects). The minimum allowed is `1s`. The maximum allowed is `30s`. |
 | `retry_condition` | string | no | A CEL expression evaluated after each failed attempt. If `true`, the request is retried (up to `3` times). Values: `attempts` (`int`): Total number of attempts so far, `last_attempt.req`: The last request object, `last_attempt.res`: The last response object (if any), `last_attempt.error`: The error string (if any) Accepts CEL interpolation. |
-| `on_error` | enum | no | Determines how to proceed if the HTTP request fails. Values: `continue` (default) – Proceed with remaining actions, `halt` – Stop processing the policy |
+| `on_error` | enum | no | Determines how to proceed if the HTTP request fails. Values: `continue` (default): Proceed with remaining actions, `halt`: Stop processing the policy |
 
 ### Field details
 
@@ -59,13 +59,12 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - name: BasicInternalRequest
-      actions:
-        - type: http-request
-          config:
-            url: https://upstream-service.internal/ping
-
+on_http_request:
+  - name: BasicInternalRequest
+    actions:
+      - type: http-request
+        config:
+          url: https://upstream-service.internal/ping
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/http-request>

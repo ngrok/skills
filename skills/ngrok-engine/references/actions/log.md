@@ -12,7 +12,7 @@ Add log metadata to events for logging and monitoring.
 
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `metadata` | map[string]any | yes | A key-value map of metadata that you would like to include in your events for this action. Accepts CEL interpolation. |
+| `metadata` | map[string]any | yes | A key-value map of metadata to include in your events for this action. Accepts CEL interpolation. |
 
 ## Result variables
 
@@ -23,14 +23,13 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: log
-          config:
-            metadata:
-              message: Log action executed.
-              endpoint_id: ${endpoint.id}
-
+on_http_request:
+  - actions:
+      - type: log
+        config:
+          metadata:
+            message: Log action executed.
+            endpoint_id: ${endpoint.id}
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/log>

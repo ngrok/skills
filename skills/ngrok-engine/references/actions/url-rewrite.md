@@ -27,15 +27,14 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - expressions:
-        - req.url.path == '/products'
-      actions:
-        - type: url-rewrite
-          config:
-            from: /products
-            to: /products.php
-
+on_http_request:
+  - expressions:
+      - req.url.path == '/products'
+    actions:
+      - type: url-rewrite
+        config:
+          from: /products
+          to: /products.php
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/url-rewrite>

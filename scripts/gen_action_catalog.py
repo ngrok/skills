@@ -8,7 +8,8 @@ Two steps, so the check that runs on every PR needs no network:
     python3 scripts/gen_action_catalog.py render --check   # exit 1 if Markdown is stale
 
 Source of truth: https://ngrok.com/docs/gateway/traffic-policy/actions
-                 (the action list itself is read from ACTIONS_JSON, see below)
+                 (the action list is read from ACTIONS_JSON, and the fields
+                 from the page source at DOCS_SRC, see below)
 Snapshot:        scripts/data/traffic-policy-actions.json (committed)
 Output:          skills/ngrok-engine/references/action-catalog.md (index),
                  skills/ngrok-engine/references/actions/*.md (one per action),
@@ -33,6 +34,7 @@ DOCS = "https://ngrok.com/docs/gateway/traffic-policy/actions"
 # The docs publish the action list as JSON for tools. It has no categories, so
 # `fetch` keeps the categories from the last snapshot.
 ACTIONS_JSON = "https://ngrok.com/docs/gateway/traffic-policy/actions.json"
+DOCS_SRC = "https://raw.githubusercontent.com/ngrok/ngrok-docs/main/gateway/traffic-policy/actions"
 
 REPO = Path(__file__).resolve().parent.parent
 SNAPSHOT = REPO / "scripts" / "data" / "traffic-policy-actions.json"
@@ -277,7 +279,13 @@ def parse_example(md: str) -> str:
     m = re.search(r"```ya?ml[^\n]*\n(.*?)```", blob, re.S)
     if not m:
         return ""
-    lines = [ln.rstrip() for ln in m.group(1).strip("\n").split("\n")]
+    body = m.group(1)
+    # The published page renders an example inside a tab as a blockquote.
+    raw = [ln for ln in body.split("\n") if ln.strip()]
+    if raw and all(ln.lstrip().startswith(">") for ln in raw):
+        body = re.sub(r"^\s*> ?", "", body, flags=re.M)
+    body = textwrap.dedent(body)
+    lines = [ln.rstrip() for ln in body.strip("\n").split("\n")]
     if len(lines) > EXAMPLE_MAX_LINES:
         lines = lines[:EXAMPLE_MAX_LINES] + ["# ...truncated, see the action's docs page"]
     return "\n".join(lines)
@@ -292,7 +300,10 @@ def enrich(a: Action) -> None:
     if m and a.policy_type and m.group(1) != a.policy_type:
         sys.exit(f"{a.type}: page type {m.group(1)!r} disagrees with the action list {a.policy_type!r}")
     a.policy_type = a.policy_type or (m.group(1) if m else a.type)
-    a.config = parse_fields(section(md, "Configuration fields"))
+    # The published page flattens the ConfigField components, so read the
+    # fields from the page source.
+    src = fetch(f"{DOCS_SRC}/{a.type}.mdx")
+    a.config = parse_fields(section(src, "Configuration fields"))
     # Rewrite nested field names as full dotted paths. More informative than
     # indentation and far cheaper to tokenize than &nbsp; runs.
     cpath: list[str] = []
@@ -302,7 +313,7 @@ def enrich(a: Action) -> None:
             f.name = splice_path(cpath, f.name)
         cpath.append(f.name)
     path: list[str] = []
-    for f in parse_fields(section(md, "Action result variables", level="##")):
+    for f in parse_fields(section(src, "Action result variables", level="##")):
         del path[f.depth:]
         name = f.name
         if f.depth and path:
@@ -529,12 +540,15 @@ def cmd_fetch() -> int:
         enrich(a)
     # A page format change makes pages parse empty. Stop here, so the weekly
     # job does not open a PR that deletes part of the catalog.
-    lost = sorted(
-        a.type for a in actions
-        if not a.config and a.policy_type in previous and previous[a.policy_type].config
-    )
+    lost = []
+    for a in actions:
+        old = previous.get(a.policy_type)
+        if old and old.config and not a.config:
+            lost.append(f"{a.type} (configuration fields)")
+        if old and old.results and not a.results:
+            lost.append(f"{a.type} (result variables)")
     if lost:
-        sys.exit(f"configuration fields disappeared for {', '.join(lost)}; the action page format changed")
+        sys.exit(f"fields disappeared for {', '.join(lost)}; the action page format changed")
     save_snapshot(actions)
     print(f"wrote {SNAPSHOT.relative_to(REPO)}; now run `render`", file=sys.stderr)
     return 0

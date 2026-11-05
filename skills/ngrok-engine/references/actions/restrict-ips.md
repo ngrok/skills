@@ -12,7 +12,7 @@ Allow or deny incoming traffic based on the client IP.
 
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `enforce` | boolean | yes | Default true. If false, continue to the next action even if the IP is not permitted. |
+| `enforce` | boolean | yes | Default true. If false, continue to the next action even if the IP isn't permitted. |
 | `allow` | array of strings | no | A list of CIDRs that are allowed. Accepts CEL interpolation. |
 | `deny` | array of strings | no | A list of CIDRs that are denied. Accepts CEL interpolation. |
 | `ip_policies` | array of refs | no | List of IP Policy identifiers to be checked if the source IP is allowed access. |
@@ -29,16 +29,15 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_tcp_connect:
-    - actions:
-        - type: restrict-ips
-          config:
-            enforce: true
-            allow:
-              - 1.1.1.1/32
-            deny:
-              - 110.0.0.0/8
-
+on_tcp_connect:
+  - actions:
+      - type: restrict-ips
+        config:
+          enforce: true
+          allow:
+            - 1.1.1.1/32
+          deny:
+            - 110.0.0.0/8
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/restrict-ips>

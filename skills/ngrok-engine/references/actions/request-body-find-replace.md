@@ -27,16 +27,15 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: request-body-find-replace
-          config:
-            replacements:
-              - from: '"api_key":\s*"[^"]*"'
-                to: '"api_key": "[REDACTED]"'
-              - from: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-                to: "[EMAIL REDACTED]"
-
+on_http_request:
+  - actions:
+      - type: request-body-find-replace
+        config:
+          replacements:
+            - from: '"api_key":\s*"[^"]*"'
+              to: '"api_key": "[REDACTED]"'
+            - from: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+              to: "[EMAIL REDACTED]"
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/request-body-find-replace>

@@ -22,13 +22,12 @@ Control the behavior of TLS termination on your endpoints.
 ## Example
 
 ```yaml
-  on_tcp_connect:
-    - actions:
-        - type: terminate-tls
-          config:
-            min_version: '1.3'
-            max_version: '1.3'
-
+on_tcp_connect:
+  - actions:
+      - type: terminate-tls
+        config:
+          min_version: '1.3'
+          max_version: '1.3'
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/terminate-tls>
