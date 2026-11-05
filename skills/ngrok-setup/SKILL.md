@@ -12,7 +12,7 @@ compatibility: Requires the ngrok CLI, an ngrok SDK, or an ngrok API key, depend
 
 # Set up ngrok
 
-Get the user authenticated and pointed at the right surface. Every ngrok action requires an authtoken (agent/SDK) or an API key (IaC) - there is no unauthenticated mode; this is deliberate abuse prevention.
+Get the user authenticated and pointed at the right surface. Every ngrok action requires a credential: an authtoken (agent/SDK), an API key (IaC and the REST API), or an OAuth login to the ngrok MCP server. There is no unauthenticated mode; this is deliberate abuse prevention.
 
 ## 1. Figure out the surface
 
@@ -34,6 +34,8 @@ If it is not obvious, the terminal path is the safe default for one-off tasks.
 3. Tell them to say when it is done, then re-run `ngrok config check` to confirm and carry on with the original task. Run every *other* ngrok command yourself - the authtoken is the one step that stays with the user.
 
 **IaC and the REST API (API key):** Terraform, the operator, and `api.ngrok.com` authenticate with an ngrok API key (the operator needs an API key *and* an authtoken), not the agent authtoken. Point the user to https://dashboard.ngrok.com/api-keys and have them set it as the provider/operator credential or `NGROK_API_KEY`. See `ngrok-surfaces`.
+
+Before you ask for an API key, check whether the ngrok MCP server is connected. If it is, a one-off account resource such as a vault, a secret, or a cloud endpoint needs no API key. `ngrok-surfaces` says when to use which.
 
 The two credentials are not interchangeable and have very different blast radii: an API key administers the account, an authtoken only starts agent sessions. If a call fails with an auth error, check which one is in play before rotating anything.
 
