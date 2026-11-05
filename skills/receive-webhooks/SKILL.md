@@ -7,7 +7,7 @@ metadata:
   version: "1.0"
   category: connectivity
   surface: job
-compatibility: Requires ngrok CLI installed and authenticated. Requires an ngrok API key to create Vaults and Secrets from the command line.
+compatibility: Requires ngrok CLI installed and authenticated. Requires the ngrok MCP server or an ngrok API key to create Vaults and Secrets.
 ---
 
 # Receive webhooks
@@ -65,6 +65,6 @@ Give the user the public URL to paste into the provider's webhook settings.
 
 - Don't tell the user to write signature-verification code - the whole point is that `verify-webhook` replaces it.
 - Never hardcode the signing secret; use a Vault or env var.
-- Do not ask the user to paste the signing secret into the chat, and do not accept one offered that way. Have them put it in a Vault via ngrok dashboard or API (`ngrok api secrets create`) or an env var themselves, and reference it from the policy. A `whsec_...` in a transcript is a leaked secret.
+- Do not ask the user to paste the signing secret into the chat, and do not accept one offered that way. Have them put it in a Vault themselves, or in an env var, and reference it from the policy. When `ngrok-surfaces` ("Account resources") picks the ngrok MCP server, create the vault with `gw_create_vault` and the secret with `gw_create_secret`. The secret tool gives the user a dashboard form for the value, so no API key is needed. Otherwise use the dashboard or `ngrok api secrets create`. A `whsec_...` in a transcript is a leaked secret.
 - Nothing that rewrites the body may run before `verify-webhook`, or the signature check breaks.
 - If the ngrok MCP server is connected, `gw_query_traffic_inspector` shows whether the provider's request arrived and what the endpoint returned. Check it before you debug the receiver.

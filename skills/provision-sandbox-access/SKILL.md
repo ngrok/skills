@@ -18,7 +18,7 @@ This differs from `expose-localhost` in lifecycle and trust. There, a developer 
 
 ## Before you start
 
-You need an ngrok API key (not an agent authtoken) in the controlplane. See `ngrok-setup`. The provisioning calls are documented in `ngrok-surfaces` (`ngrok-surfaces/references/api.md` and `ngrok-surfaces/references/api-resources.md`); this skill is the recipe, those are the mechanics.
+You need an ngrok API key (not an agent authtoken) in the controlplane. See `ngrok-setup`. The ngrok MCP server does not replace it, because the controlplane is code that runs without you. If the MCP server is connected, use it to check what the controlplane created, such as `gw_list_endpoints`. The provisioning calls are documented in `ngrok-surfaces` (`ngrok-surfaces/references/api.md` and `ngrok-surfaces/references/api-resources.md`); this skill is the recipe, those are the mechanics.
 
 ## The shape
 

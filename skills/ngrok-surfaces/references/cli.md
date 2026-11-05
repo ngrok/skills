@@ -95,6 +95,8 @@ config right; a service hides its errors in the system log.
 
 ## Driving the API from the CLI
 
+Use this path when the ngrok MCP server is not connected. If it is connected, create these resources with its tools and do not ask for an API key. See "Account resources" in `../SKILL.md`.
+
 `ngrok api ..` covers resources that outlive the agent, and takes a policy as a file
 instead of an escaped JSON string:
 

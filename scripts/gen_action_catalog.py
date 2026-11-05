@@ -8,7 +8,7 @@ Two steps, so the check that runs on every PR needs no network:
     python3 scripts/gen_action_catalog.py render --check   # exit 1 if Markdown is stale
 
 Source of truth: https://ngrok.com/docs/gateway/traffic-policy/actions
-                 (the action list itself is read from ACTION_HUB, see below)
+                 (the action list itself is read from ACTIONS_JSON, see below)
 Snapshot:        scripts/data/traffic-policy-actions.json (committed)
 Output:          skills/ngrok-engine/references/action-catalog.md (index),
                  skills/ngrok-engine/references/actions/*.md (one per action),
@@ -30,9 +30,9 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 DOCS = "https://ngrok.com/docs/gateway/traffic-policy/actions"
-# The docs render the action list from this snippet. The published .md page no
-# longer inlines it, so read the snippet from the public docs repo instead.
-ACTION_HUB = "https://raw.githubusercontent.com/ngrok/ngrok-docs/main/snippets/ActionHub.jsx"
+# The docs publish the action list as JSON for tools. It has no categories, so
+# `fetch` keeps the categories from the last snapshot.
+ACTIONS_JSON = "https://ngrok.com/docs/gateway/traffic-policy/actions.json"
 
 REPO = Path(__file__).resolve().parent.parent
 SNAPSHOT = REPO / "scripts" / "data" / "traffic-policy-actions.json"
@@ -137,35 +137,37 @@ class Action:
     policy_type: str = ""  # what you actually write in a policy; may differ from the slug
 
 
-def parse_index(md: str) -> list[Action]:
-    start = md.find("const actions = [")
-    if start == -1:
-        sys.exit("could not locate the ActionHub action list; docs layout changed")
-    end = md.find("];", start)
-    blob = md[start:end]
+def parse_index(text: str, previous: dict[str, Action]) -> list[Action]:
+    try:
+        entries = json.loads(text)["actions"]
+    except (ValueError, KeyError, TypeError) as e:
+        sys.exit(f"could not read the action list from {ACTIONS_JSON}: {e}")
 
     actions: list[Action] = []
-    for chunk in re.split(r"\}\s*,\s*\{", blob):
-        t = re.search(r'type:\s*"([^"]+)"', chunk)
-        if not t:
-            continue
-        name = re.search(r'name:\s*"([^"]+)"', chunk)
-        desc = re.search(r'description:\s*"((?:[^"\\]|\\.)*)"', chunk)
-        phases = re.findall(r'"(on_[a-z_]+)"', chunk)
-        cats = re.search(r"categories:\s*\[([^\]]*)\]", chunk)
+    for e in entries:
+        # `type` names the generated page, so take it from the docs page slug.
+        slug = e["url"].rstrip("/").rsplit("/", 1)[-1]
         actions.append(
             Action(
-                type=t.group(1),
-                name=name.group(1) if name else t.group(1),
-                description=clean(desc.group(1).replace('\\"', '"')) if desc else "",
-                phases=phases,
-                categories=re.findall(r'"([^"]+)"', cats.group(1)) if cats else [],
-                terminating=bool(re.search(r"terminating:\s*true", chunk)),
+                type=slug,
+                name=e.get("name") or e["type"],
+                description=clean(e.get("description", "")),
+                phases=list(e.get("phases", [])),
+                categories=previous[e["type"]].categories if e["type"] in previous else [],
+                terminating=bool(e.get("terminating")),
+                policy_type=e["type"],
             )
         )
     if not actions:
         sys.exit("parsed zero actions; docs layout changed")
     return sorted(actions, key=lambda a: a.type)
+
+
+def previous_actions() -> dict[str, Action]:
+    """The last snapshot, keyed by policy type."""
+    if not SNAPSHOT.exists():
+        return {}
+    return {a.policy_type or a.type: a for a in load_snapshot()}
 
 
 # --------------------------------------------------------------------------
@@ -284,11 +286,12 @@ def parse_example(md: str) -> str:
 def enrich(a: Action) -> None:
     md = fetch(f"{DOCS}/{a.type}.md")
     a.doc_phases = re.findall(r"`(on_[a-z_]+)`", section(md, "Supported phases"))
-    # The index's identifier is the docs page slug. The page's own "Type"
-    # section is what a policy must use, and the two differ (e.g. slug `oidc`
-    # vs policy type `openid-connect`). The page wins.
+    # The action list gives the policy type, and the page's "Type" section must
+    # agree with it.
     m = re.search(r"`([a-z0-9-]+)`", section(md, "Type"))
-    a.policy_type = m.group(1) if m else a.type
+    if m and a.policy_type and m.group(1) != a.policy_type:
+        sys.exit(f"{a.type}: page type {m.group(1)!r} disagrees with the action list {a.policy_type!r}")
+    a.policy_type = a.policy_type or (m.group(1) if m else a.type)
     a.config = parse_fields(section(md, "Configuration fields"))
     # Rewrite nested field names as full dotted paths. More informative than
     # indentation and far cheaper to tokenize than &nbsp; runs.
@@ -518,11 +521,20 @@ def load_snapshot() -> list[Action]:
 # --------------------------------------------------------------------------
 
 def cmd_fetch() -> int:
-    actions = parse_index(fetch(ACTION_HUB))
+    previous = previous_actions()
+    actions = parse_index(fetch(ACTIONS_JSON), previous)
     print(f"found {len(actions)} actions", file=sys.stderr)
     for a in actions:
         print(f"  {a.type}", file=sys.stderr)
         enrich(a)
+    # A page format change makes pages parse empty. Stop here, so the weekly
+    # job does not open a PR that deletes part of the catalog.
+    lost = sorted(
+        a.type for a in actions
+        if not a.config and a.policy_type in previous and previous[a.policy_type].config
+    )
+    if lost:
+        sys.exit(f"configuration fields disappeared for {', '.join(lost)}; the action page format changed")
     save_snapshot(actions)
     print(f"wrote {SNAPSHOT.relative_to(REPO)}; now run `render`", file=sys.stderr)
     return 0

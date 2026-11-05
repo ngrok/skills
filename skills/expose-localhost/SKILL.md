@@ -266,7 +266,7 @@ Attach it the same way: `ngrok tcp {PORT} --traffic-policy-file .ngrok/traffic-p
 
 Only use if the user explicitly needs a URL that persists after the agent stops (e.g., webhooks, long-lived integrations).
 
-Requires an API key: `ngrok config add-api-key <KEY>` (get at https://dashboard.ngrok.com/api-keys)
+Requires the ngrok MCP server or an API key. If the user manages ngrok as code, add the endpoint there instead. If not, and the MCP server is connected, use it and do not ask for an API key: `gw_reserve_domain` and `gw_create_cloud_endpoint` replace steps 1 and 2, and `delete_resource` replaces step 4. Otherwise the user sets an API key with `ngrok config add-api-key <KEY>` (from https://dashboard.ngrok.com/api-keys). See `ngrok-surfaces` for the order to pick in.
 
 1. Reserve domain: `ngrok api reserved-domains create --domain "{DOMAIN}"`
 2. Create cloud endpoint with a traffic policy that includes `forward-internal` as the **last** action:

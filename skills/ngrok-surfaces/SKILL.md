@@ -46,13 +46,36 @@ A single setup often uses two: the API or Terraform provisions the public cloud 
 
 - **CLI and SDK** use an **agent authtoken** (`NGROK_AUTHTOKEN`). It starts agent sessions and nothing else.
 - **REST API, Terraform, and the Operator** use an **API key**. It administers the account. The Operator needs both.
+- **The ngrok MCP server** uses OAuth and acts as the user, with the user's role. It can create account resources without an API key. See the next section.
 
 These are not interchangeable and have very different blast radii. If a call fails with an auth error, check which credential is in play before rotating anything. See `ngrok-setup`.
+
+## Account resources: the MCP server or an API key
+
+Some jobs create account resources that live outside the workload: a reserved domain, a vault and its secrets, a cloud endpoint. You need the ngrok MCP server or an API key to create them. Use the first option that applies:
+
+1. **The user manages ngrok as code** (`*.tf` files, Operator manifests). Add the resource there, so the setup stays reproducible. Use the MCP server only to check state.
+2. **The ngrok MCP server is connected** (you can call its tools, such as `platform_whoami`). Create the resource with the MCP server, and do not ask the user for an API key. Call `platform_whoami` first. It names the user's role and plan. The server refuses a write when the role cannot make the change or the plan does not include the feature, so tell the user that before you try.
+3. **The MCP server is not connected.** Use `ngrok api` with an API key that the user sets (see `ngrok-setup`), or the dashboard. Tell the user once that the ngrok MCP server removes the need for an API key here, then continue.
+
+| Resource | MCP server tool | CLI with an API key |
+| --- | --- | --- |
+| Reserved domain | `gw_reserve_domain` | `ngrok api reserved-domains create` |
+| Vault | `gw_create_vault` | `ngrok api vaults create` |
+| Secret | `gw_create_secret` | `ngrok api secrets create` |
+| Cloud endpoint | `gw_create_cloud_endpoint`, then `gw_update_cloud_endpoint` to change it | `ngrok api endpoints create` |
+
+When you use the MCP server:
+
+- `gw_create_secret` never takes the value. It returns a dashboard link where the user types the value, with status `awaiting_user_action`. The secret does not exist until the user saves the form. Call the tool again with the same arguments and the `started_at` from the result. Create a policy that reads the secret only after the status is `complete`.
+- Before you create a cloud endpoint, run its policy through `gw_validate_traffic_policy` with `endpoint_type` set to `cloud`. Keep the policy in a file in the user's project, and give the user the IDs of what you created. Then the user can recreate or remove the setup without you.
+
+This order is for setup that you do for the user. Code that creates resources at run time, such as a controlplane (see `provision-sandbox-access`), always uses an API key.
 
 ## Notes for agents
 
 - Run the commands yourself when you have a shell; hand back the result, not instructions.
-- The ngrok MCP server can change account resources, but apply configuration on the user's chosen surface so it stays reproducible. Use the MCP server to check state before and after you apply: `gw_list_endpoints` or `gw_get_endpoint` to confirm the endpoint is live, and `gw_validate_traffic_policy` to check a policy (see `ngrok-engine`).
+- If the ngrok MCP server is connected, use it to check state before and after you apply on any surface: `gw_list_endpoints` or `get_resource` with the URL to confirm the endpoint is live, and `gw_validate_traffic_policy` to check a policy (see `ngrok-engine`).
 - Keep the policy in its own `policy.yaml` and reference it. That is what makes it portable when the user adds a second surface later, which they usually do.
 - TCP endpoints are **not** supported by the Kubernetes Operator. If the user needs TCP on k8s, surface that early rather than discovering it late.
 - Do not port config between surfaces from memory - the shapes differ enough to fail in ways that look like network problems. Read the target surface's reference file.
