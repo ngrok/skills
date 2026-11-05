@@ -23,13 +23,12 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-      - type: "add-headers"
-        config:
-          headers:
-            x-client-ip: "${conn.client_ip}"
-
+on_http_request:
+  - actions:
+    - type: "add-headers"
+      config:
+        headers:
+          x-client-ip: "${conn.client_ip}"
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/add-headers>

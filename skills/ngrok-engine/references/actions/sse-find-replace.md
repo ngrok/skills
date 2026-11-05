@@ -28,20 +28,19 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_event_stream_message:
-    - actions:
-        - type: sse-find-replace
-          config:
-            replacements:
-              # Redact SSN patterns in streaming content
-              - field: data
-                from: "\\d{3}-\\d{2}-\\d{4}"
-                to: "[SSN REDACTED]"
-              # Redact email addresses
-              - field: data
-                from: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
-                to: "[EMAIL REDACTED]"
-
+on_event_stream_message:
+  - actions:
+      - type: sse-find-replace
+        config:
+          replacements:
+            # Redact SSN patterns in streaming content
+            - field: data
+              from: "\\d{3}-\\d{2}-\\d{4}"
+              to: "[SSN REDACTED]"
+            # Redact email addresses
+            - field: data
+              from: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+              to: "[EMAIL REDACTED]"
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/sse-find-replace>

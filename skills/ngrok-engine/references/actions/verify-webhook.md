@@ -14,7 +14,7 @@ Validate incoming signatures against a known secret to ensure authenticity.
 | --- | --- | --- | --- |
 | `provider` | string | yes | The name of the provider to verify webhook requests from. Value must be a supported provider identifier. Don't see your provider? Request support for it here. |
 | `secret` | string | yes | The secret key used to validate webhook requests from the specified provider. Supports CEL Interpolation. Accepts CEL interpolation. |
-| `enforce` | bool | no | When `true`, the request will be halted if the webhook is not valid and no further actions will run. However when `false`, subsequent actions will run even if the webhook was not valid. Default `true`. |
+| `enforce` | bool | no | When `true`, ngrok halts the request if the webhook isn't valid, and no further actions run. However, when `false`, subsequent actions run even if the webhook isn't valid. Default `true`. |
 
 ## Result variables
 
@@ -27,19 +27,18 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: verify-webhook
-          config:
-            provider: gitlab
-            secret: secret!
-        - type: custom-response
-          config:
-            status_code: 200
-            headers:
-              content-type: text/plain
-            body: GitLab webhook verified
-
+on_http_request:
+  - actions:
+      - type: verify-webhook
+        config:
+          provider: gitlab
+          secret: secret!
+      - type: custom-response
+        config:
+          status_code: 200
+          headers:
+            content-type: text/plain
+          body: GitLab webhook verified
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/verify-webhook>

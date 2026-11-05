@@ -12,10 +12,10 @@ Validate JSON Web Tokens (JWTs) on your incoming requests.
 
 | Field | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `issuer` | object | yes | Configuration object for the Issuer(s) of the JWTs. |
+| `issuer` | object | yes | Configuration object for the issuers of the JWTs. |
 | `issuer.allow_list` | array of objects | yes | List of allowed issuers. Minimum `1`. |
 | `issuer.allow_list[*].value` | string | yes | Issuer URL. This can be found in the `iss` claim after decoding the JWT or from the `/.well-known/openid-configuration` endpoint in your Identity Provider. Accepts CEL interpolation. |
-| `audience` | object | no | Configuration object for the Audience(s) of the JWTs. |
+| `audience` | object | no | Configuration object for the audiences of the JWTs. |
 | `audience.allow_list` | array of objects | no | List of allowed audiences. Minimum `1`. |
 | `audience.allow_list[*].value` | string | no | Audience claim value. This can be found in the `aud` claim after decoding the JWT or from the request used to create the token in the first place. |
 | `http` | object | yes | Configuration object for the HTTP requests containing JWTs. |
@@ -55,34 +55,33 @@ Readable from `expressions` in later rules once this action has run.
 ## Example
 
 ```yaml
-  on_http_request:
-    - actions:
-        - type: jwt-validation
-          config:
-            issuer:
-              allow_list:
-                - value: https://example.com/issuer
-            audience:
-              allow_list:
-                - value: urn:example:api
-            http:
-              tokens:
-                - type: access_token
-                  method: header
-                  name: Authorization
-                  prefix: 'Bearer '
-                - type: it+jwt
-                  method: body
-                  name: _id_token
-            jws:
-              allowed_algorithms:
-                - RS256
-                - ES256
-              keys:
-                sources:
-                  additional_jkus:
-                    - https://example.com/issuer/jku
-
+on_http_request:
+  - actions:
+      - type: jwt-validation
+        config:
+          issuer:
+            allow_list:
+              - value: https://example.com/issuer
+          audience:
+            allow_list:
+              - value: urn:example:api
+          http:
+            tokens:
+              - type: access_token
+                method: header
+                name: Authorization
+                prefix: 'Bearer '
+              - type: it+jwt
+                method: body
+                name: _id_token
+          jws:
+            allowed_algorithms:
+              - RS256
+              - ES256
+            keys:
+              sources:
+                additional_jkus:
+                  - https://example.com/issuer/jku
 ```
 
 Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/jwt-validation>
