@@ -35,7 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SKILLS = ROOT / "skills"
 REPO_URL = "https://github.com/ngrok/skills"
 DOCS = "https://ngrok.com/docs"
-ACTION_HUB = "https://raw.githubusercontent.com/ngrok/ngrok-docs/main/snippets/ActionHub.jsx"
+ACTIONS_JSON = f"{DOCS}/gateway/traffic-policy/actions.json"
 
 errors: list[str] = []
 
@@ -227,22 +227,14 @@ def check_error_codes() -> None:
 
 
 def published_action_types() -> set[str]:
-    # The docs render the action list from the ActionHub snippet, but its `type`
-    # field is the page slug, which is not always the policy type (the `oidc`
-    # page documents `openid-connect`). Read each page's "Type" section, and
-    # fall back to the slug for pages that do not have one.
-    status, body = get(ACTION_HUB)
-    slugs = set(re.findall(r'type:\s*"([a-z0-9-]+)"', body))
-    if status != 200 or not slugs:
-        sys.exit(f"could not read the action list from the docs (HTTP {status})")
-
-    def type_of(slug: str) -> str:
-        _, page = get(f"{DOCS}/gateway/traffic-policy/actions/{slug}.md")
-        m = re.search(r"^### Type\s+`([a-z0-9-]+)`", page, re.M)
-        return m.group(1) if m else slug
-
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        return set(pool.map(type_of, slugs))
+    status, body = get(ACTIONS_JSON)
+    try:
+        types = {a["type"] for a in json.loads(body)["actions"]}
+    except (ValueError, KeyError, TypeError):
+        types = set()
+    if status != 200 or not types:
+        sys.exit(f"could not read the action list from {ACTIONS_JSON} (HTTP {status})")
+    return types
 
 
 def action_types_in(node):

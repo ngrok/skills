@@ -28,7 +28,7 @@ All 26 Traffic Policy actions. This file is the index only. Each action's config
 | [`jwt-validation`](actions/jwt-validation.md) | `on_http_request` | no | Validate JSON Web Tokens (JWTs) on your incoming requests. |
 | [`log`](actions/log.md) | `on_tcp_connect` `on_http_request` `on_http_response` | no | Add log metadata to events for logging and monitoring. |
 | [`oauth`](actions/oauth.md) | `on_http_request` | no | Add OAuth login for your HTTP endpoints. |
-| [`openid-connect`](actions/oidc.md) | `on_http_request` | no | Add OpenID Connect login for your HTTP endpoints. |
+| [`openid-connect`](actions/openid-connect.md) | `on_http_request` | no | Add OpenID Connect login for your HTTP endpoints. |
 | [`owasp-crs-request`](actions/owasp-crs-request.md) | `on_http_request` | no | Add OWASP CoreRuleSet to incoming HTTP requests to your endpoints. |
 | [`owasp-crs-response`](actions/owasp-crs-response.md) | `on_http_response` | no | Add OWASP CoreRuleSet to outgoing HTTP responses from your endpoints. |
 | [`rate-limit`](actions/rate-limit.md) | `on_http_request` | no | Rate limit incoming traffic to your endpoint before it hits your upstream servers. |

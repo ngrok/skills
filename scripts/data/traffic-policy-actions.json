@@ -1086,7 +1086,7 @@
     "policy_type": "oauth"
   },
   {
-    "type": "oidc",
+    "type": "openid-connect",
     "name": "OpenID Connect (OIDC)",
     "description": "Add OpenID Connect login for your HTTP endpoints.",
     "phases": [

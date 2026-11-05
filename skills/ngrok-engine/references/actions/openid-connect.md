@@ -2,8 +2,6 @@
 
 **Generated from ngrok's published documentation - do not hand-edit.**
 
-Write `type: openid-connect` in a policy. This page is filed under the docs slug `oidc`, which is not a valid action type.
-
 Add OpenID Connect login for your HTTP endpoints.
 
 - **Phases:** `on_http_request`
@@ -65,4 +63,4 @@ Readable from `expressions` in later rules once this action has run.
 
 ```
 
-Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/oidc>
+Docs: <https://ngrok.com/docs/gateway/traffic-policy/actions/openid-connect>
