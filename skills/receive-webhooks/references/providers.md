@@ -9,7 +9,7 @@ For the authoritative current list, consult ngrok's verify-webhook documentation
 
 ## Per-provider setup shape (same for all)
 1. In the provider's dashboard, find the webhook signing secret (name varies: "signing secret", "webhook secret", "app secret").
-2. Store it in a Vault:
+2. Store it in a Vault. Pick the tool with `ngrok-surfaces` ("Account resources"). With the ngrok MCP server, `gw_create_secret` gives the user a dashboard form for the value. Without it, the user runs:
    `ngrok api secrets create --name "<provider>-signing-secret" --value "<secret>" --vault-id "$VAULT_ID"`
 3. Reference it in the policy: `secret: "${secrets.get('webhooks','<provider>-signing-secret')}"`.
 4. Point the provider's webhook URL at your ngrok endpoint (append the path if you route by path, e.g. `/stripe`).
