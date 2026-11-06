@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  # release.yml calls this workflow, so a release runs exactly these checks.
+  workflow_call:
+    inputs:
+      skip-docs:
+        description: Skip the network checks against ngrok.com/docs
+        type: boolean
+        default: false
 
 # Docs-side changes that happen without a PR here are caught weekly by drift.yml.
 
@@ -37,9 +44,38 @@ jobs:
       - name: Validate structure, references, manifests, and examples
         run: uv run --with pyyaml==6.0.3 scripts/validate.py
 
+  bundle:
+    # The release bundle, built from the PR head exactly as release.yml builds
+    # it. Publishes nothing.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # tags, for next_version.py
+          persist-credentials: false
+
+      - name: Test the release scripts
+        run: python3 -m unittest discover -s scripts/tests -v
+
+      # The pause makes a build that took its timestamps from the clock, not
+      # the commit, come out different.
+      - name: Build the bundle twice and compare
+        run: |
+          bash scripts/build_bundle.sh dist/a
+          sleep 2
+          bash scripts/build_bundle.sh dist/b
+          cmp dist/a/skills.tar.gz dist/b/skills.tar.gz
+
+      - name: Check the bundle against skills/
+        run: bash scripts/check_bundle.sh dist/a
+
+      - name: Pick the next version against the real tags
+        run: python3 scripts/next_version.py
+
   docs:
     # Network checks against ngrok.com/docs. Kept separate so a docs outage
-    # or a slow page does not block an unrelated PR.
+    # or a slow page does not block an unrelated PR, or a release.
+    if: ${{ !inputs.skip-docs }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
