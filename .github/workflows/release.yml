@@ -1,0 +1,171 @@
+name: Release
+
+# Publishes a dated release of the skills bundle on every skills change, with
+# skills.tar.gz and its .sha256 as assets. A client reads the tag from the
+# redirect of /releases/latest, then downloads both from /releases/download/<tag>/.
+# See "Releases" in README.md.
+#
+# This workflow commits nothing. The release and its tag are the only output.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - "scripts/build_bundle.sh"
+  workflow_dispatch:
+
+# Two quick merges release one after the other, so they never pick the same
+# same-day suffix.
+concurrency:
+  group: release-skills-bundle
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    # A manual dispatch from another branch must not publish.
+    if: github.ref == 'refs/heads/main'
+    # The same checks as a PR, from the same file, minus the network checks
+    # against ngrok.com/docs (drift.yml covers those weekly).
+    uses: ./.github/workflows/ci.yml
+    with:
+      skip-docs: true
+    permissions:
+      contents: read
+
+  release:
+    needs: ci
+    runs-on: ubuntu-latest
+    # Only first-party code runs in this job: checkout, git, gh, curl, and the
+    # scripts in this repo. GH_TOKEN is set on the one step that publishes.
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # full history and tags, for next_version.py and the notes
+          persist-credentials: false
+
+      # skip:    HEAD is no longer the tip of main, for example a re-run of an
+      #          old run. Publishing it would replace newer skills as latest.
+      # verify:  HEAD is the tip and already released, for example a re-run
+      #          after a failed verify. Check the release again; publish nothing.
+      # publish: HEAD is the tip and not released yet.
+      - name: Decide what to do
+        id: plan
+        run: |
+          head="$(git rev-parse HEAD)"
+          tip="$(git ls-remote origin refs/heads/main | cut -f1)"
+          tag="$(git tag --points-at HEAD --list 'v*' | head -n1)"
+          echo "sha=$head" >> "$GITHUB_OUTPUT"
+          if [ "$head" != "$tip" ]; then
+            echo "::notice::HEAD $head is not the tip of main ($tip); a newer run releases it."
+            echo "mode=skip" >> "$GITHUB_OUTPUT"
+          elif [ -n "$tag" ]; then
+            echo "HEAD is already released as $tag; verifying it."
+            echo "mode=verify" >> "$GITHUB_OUTPUT"
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          else
+            tag="$(python3 scripts/next_version.py)"
+            echo "mode=publish" >> "$GITHUB_OUTPUT"
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+            echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build and check the bundle
+        if: steps.plan.outputs.mode == 'publish'
+        run: |
+          bash scripts/build_bundle.sh dist
+          bash scripts/check_bundle.sh dist
+
+      - name: Write the release notes
+        if: steps.plan.outputs.mode == 'publish'
+        run: |
+          # The nearest earlier release on main's own history, if any.
+          prev="$(git describe --tags --abbrev=0 --match 'v*' --first-parent HEAD 2>/dev/null || true)"
+          {
+            if [ -z "$prev" ]; then
+              echo "First release. Skills:"
+              echo
+              git ls-tree -d --name-only HEAD:skills | sed 's/^/- /'
+            else
+              changed="$(git diff --name-only "$prev"..HEAD -- skills/ | cut -d/ -f2 | sort -u)"
+              if [ -n "$changed" ]; then
+                echo "Skills changed since $prev:"
+                echo
+                echo "$changed" | sed 's/^/- /'
+              else
+                echo "No skill content changed since $prev; the bundle was rebuilt."
+              fi
+            fi
+            echo
+            echo "Download \`skills.tar.gz\` and check it against \`skills.tar.gz.sha256\`. It unpacks to one directory per skill."
+          } > dist/notes.md
+          cat dist/notes.md
+
+      # Immutability applies once a release is published, and then its assets
+      # cannot change. `gh release create` with files creates a draft, uploads
+      # the files, then publishes (see `gh release create --help`), so the
+      # assets are in place first. If an upload fails, the draft stays behind
+      # holding the tag name; drafts can be deleted, so remove any left by an
+      # earlier run. Only drafts with a release-style tag are touched.
+      - name: Publish the release
+        if: steps.plan.outputs.mode == 'publish'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.plan.outputs.tag }}
+          VERSION: ${{ steps.plan.outputs.version }}
+          SHA: ${{ steps.plan.outputs.sha }}
+        run: |
+          gh release list --repo "$GITHUB_REPOSITORY" --json tagName,isDraft \
+            --jq '.[] | select(.isDraft and (.tagName | test("^v[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}(\\.[0-9]+)?$"))) | .tagName' |
+          while read -r draft; do
+            echo "Deleting a leftover draft for $draft."
+            gh release delete "$draft" --repo "$GITHUB_REPOSITORY" --yes
+          done
+          gh release create "$TAG" dist/skills.tar.gz dist/skills.tar.gz.sha256 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$SHA" \
+            --title "$VERSION" \
+            --notes-file dist/notes.md \
+            --latest
+
+      # Take the path a client takes: the redirect of /releases/latest, then
+      # the /releases/download/ URLs. No api.github.com, and no token.
+      - name: Verify the published release
+        if: steps.plan.outputs.mode != 'skip'
+        env:
+          TAG: ${{ steps.plan.outputs.tag }}
+          SHA: ${{ steps.plan.outputs.sha }}
+        run: |
+          base="https://github.com/$GITHUB_REPOSITORY/releases"
+          for attempt in 1 2 3 4 5 6; do
+            location="$(curl -sS --retry 3 -o /dev/null -w '%{redirect_url}' "$base/latest" || true)"
+            case "$location" in
+              */releases/tag/"$TAG") echo "releases/latest -> $location"; break ;;
+            esac
+            if [ "$attempt" = 6 ]; then
+              echo "::error::releases/latest redirects to '$location', expected .../releases/tag/$TAG"
+              exit 1
+            fi
+            sleep 10
+          done
+
+          # The tag must point at the commit that was built. For an annotated
+          # tag, the peeled (^{}) line comes last.
+          tagged="$(git ls-remote --tags origin "$TAG" | tail -n1 | cut -f1)"
+          if [ "$tagged" != "$SHA" ]; then
+            echo "::error::tag $TAG points at '$tagged', expected $SHA"
+            exit 1
+          fi
+
+          mkdir verify
+          curl -fsSL --retry 3 -o verify/skills.tar.gz "$base/download/$TAG/skills.tar.gz"
+          curl -fsSL --retry 3 -o verify/skills.tar.gz.sha256 "$base/download/$TAG/skills.tar.gz.sha256"
+          bash scripts/check_bundle.sh verify
+          if [ -f dist/skills.tar.gz ]; then
+            cmp verify/skills.tar.gz dist/skills.tar.gz
+          fi

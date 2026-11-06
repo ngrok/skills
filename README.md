@@ -82,6 +82,35 @@ Each skill contains:
 - `SKILL.md` — instructions for the agent
 - `references/` — supporting documentation (optional)
 
+## Releases
+
+Every merge to `main` that changes `skills/` (or the bundle script) publishes a dated release, after the same checks as a pull request (`.github/workflows/release.yml`). A maintainer can also run the workflow by hand from `main`. The newest release is always at `https://github.com/ngrok/skills/releases/latest`.
+
+### Version format
+
+- **Tag.** The tag is `v` followed by the version, for example `v2026.11.04`.
+- **Version.** The version is the UTC date of the release run, written as `YYYY.MM.DD` with a zero-padded month and day.
+  - The first release of a UTC day has no suffix.
+  - Each later release that day appends `.N`, starting at `.1`: `2026.11.04`, then `2026.11.04.1`, then `2026.11.04.2`.
+- **Ordering.** Compare versions segment by segment as integers, and treat a missing segment as 0. So `2026.11.04` < `2026.11.04.1` < `2026.11.04.10` < `2026.11.05`. Do not compare them as strings: `.10` sorts before `.9` as text.
+- **Not semver.** The zero padding makes the version invalid semver. That is acceptable, because nothing reads these tags as semver. Do not copy the version into the plugin manifests' version fields. If a plugin format later needs a version, that is separate work.
+- **Strictly increasing.** Every new tag must be greater than every existing `v*` tag. A same-day suffix and a UTC clock keep it that way. The workflow also checks it (`scripts/next_version.py` exits non-zero otherwise).
+
+The reference implementation of the ordering rule is `version_key()` in [`scripts/next_version.py`](scripts/next_version.py). Anything that compares skills versions should implement the same rule.
+
+### Assets
+
+Each release carries two files:
+
+| Asset | Contents |
+| --- | --- |
+| `skills.tar.gz` | One top-level directory per skill, with that skill's files, and nothing else. There is no wrapping `skills/` directory. Built with `git archive` of the committed `skills/` tree by [`scripts/build_bundle.sh`](scripts/build_bundle.sh). |
+| `skills.tar.gz.sha256` | One line in `sha256sum` format: `<hex>  skills.tar.gz`. |
+
+Releases are immutable: once published, a release's assets and tag cannot change.
+
+To fetch the newest release without the GitHub API, read the `Location` header of `https://github.com/ngrok/skills/releases/latest` without following it. It ends in `/releases/tag/v<version>`. Then download `https://github.com/ngrok/skills/releases/download/v<version>/skills.tar.gz` and `skills.tar.gz.sha256`.
+
 ## License
 
 MIT
