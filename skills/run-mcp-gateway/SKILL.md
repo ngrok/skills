@@ -39,14 +39,14 @@ Cloud endpoint (not agent) is required here: providers connect on their own sche
    It needs `express` and `@modelcontextprotocol/sdk`. It binds loopback by default, so the process is reachable only through the local ngrok agent - pass `{ host }` to change that. stdio keeps working for local clients.
 
 2. **Run the server as an internal endpoint.** The `.internal` URL is what makes it internal - no extra binding flag:
-   `ngrok http <port> --url https://mcp.internal --host-header=rewrite`
+   `NGROK_CLIENT_SOURCE=skills/run-mcp-gateway ngrok http <port> --url https://mcp.internal --host-header=rewrite`
    The `--host-header=rewrite` matters: traffic arriving via `forward-internal` carries `Host: mcp.internal`, which the MCP SDK's DNS-rebinding protection rejects by default.
 
 3. **Create a vault + one secret per provider.** These are tokens you generate (not the provider's API key), so you can tell providers apart:
 
    ```bash
-   ngrok api vaults create --name "mcp-callers"
-   ngrok api secrets create --name "claude-key" --value "$(openssl rand -hex 32)" --vault-id "$VAULT_ID"
+   NGROK_CLIENT_SOURCE=skills/run-mcp-gateway ngrok api vaults create --name "mcp-callers"
+   NGROK_CLIENT_SOURCE=skills/run-mcp-gateway ngrok api secrets create --name "claude-key" --value "$(openssl rand -hex 32)" --vault-id "$VAULT_ID"
    ```
 
    When `ngrok-surfaces` ("Account resources") picks the ngrok MCP server, use `gw_create_vault` and `gw_create_secret` instead, and do not ask for an API key. `gw_create_secret` sends the user to a dashboard form to type the value. Have the user make each token on their machine with `openssl rand -hex 32`, paste it into that form, and keep it for the provider's settings in step 5. Never ask for the token in the chat.
@@ -65,6 +65,10 @@ Cloud endpoint (not agent) is required here: providers connect on their own sche
 - **Caller attribution is advisory.** `x-mcp-caller` tells your server which provider called, but a client holding any valid token can also send that header itself. Trust it for logging, not for authorization.
 - **The `/mcp` path.** Providers expect the MCP endpoint at a path (commonly `/mcp`); make sure the transport and the URL you hand out agree.
 - **host-header rewrite** (step 2) - the single most common reason a forwarded MCP request 400s.
+
+## Attribution
+
+Prefix each `ngrok` command you run with `NGROK_CLIENT_SOURCE=skills/run-mcp-gateway`, as the examples do. Leave it out of files you write for the user. See "Attribution" in `ngrok-surfaces`.
 
 ## Notes for agents
 

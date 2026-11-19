@@ -82,6 +82,14 @@ Each skill contains:
 - `SKILL.md` — instructions for the agent
 - `references/` — supporting documentation (optional)
 
+## Telemetry
+
+The skills tell ngrok which skill ran an ngrok command, so we can see how the skills are used and improve them. To opt out, set `DO_NOT_TRACK`:
+
+```bash
+export DO_NOT_TRACK=1
+```
+
 ## Releases
 
 Every merge to `main` that changes `skills/` (or the bundle script) publishes a dated release, after the same checks as a pull request (`.github/workflows/release.yml`). A maintainer can also run the workflow by hand from `main`. The newest release is always at `https://github.com/ngrok/skills/releases/latest`.

@@ -9,6 +9,8 @@ Offline checks:
   - references: every `references/...` or `<skill>/...` path resolves
   - manifests: plugin JSON parses, names and repo URLs agree
   - examples: YAML blocks parse, and use no deprecated agent config syntax
+  - attribution: NGROK_CLIENT_SOURCE tags name their own skill and cover every
+    ngrok command in a file that uses them
 
 Docs checks (--docs):
   - every ngrok.com/docs link returns 200
@@ -175,6 +177,44 @@ def check_examples() -> None:
                 fail(f, msg, line + src.count("\n", 0, m.start()))
 
 
+# Skill attribution tag on ngrok commands the agent runs (see README "Telemetry").
+TAG = re.compile(r"NGROK_CLIENT_SOURCE=([^\s`]+)")
+TAG_VALUE = re.compile(r"^[a-z0-9/._-]{1,64}$")
+# Reference skills don't know which task skill loaded them; the agent fills it in.
+TAG_PLACEHOLDER = "skills/{SKILL}"
+REFERENCE_SKILLS = {"ngrok-surfaces", "ngrok-engine"}
+BASH_BLOCK = re.compile(r"^[ \t]*```(?:bash|sh|shell)\n(.*?)^[ \t]*```", re.M | re.S)
+SERVER_COMMAND = re.compile(r"^\s*(?:\S+=\S+\s+)*ngrok (?:http|tcp|tls|start|api)\b")
+
+
+def check_attribution() -> None:
+    for f in markdown_files():
+        text = f.read_text()
+        skill = f.relative_to(SKILLS).parts[0]
+        tags = list(TAG.finditer(text))
+        for m in tags:
+            value, line = m.group(1), line_of(text, m.start())
+            if value == TAG_PLACEHOLDER:
+                if skill not in REFERENCE_SKILLS:
+                    fail(f, f"use skills/{skill}, not {TAG_PLACEHOLDER}, in a task skill", line)
+            elif value != f"skills/{skill}":
+                fail(f, f"attribution tag {value!r} does not name this skill (skills/{skill})", line)
+            elif not TAG_VALUE.match(value):
+                fail(f, f"attribution tag {value!r} is not lowercase [a-z0-9/._-], 64 chars max", line)
+        if not tags:
+            continue
+        # A file that tags its commands must tag all of them. A block that
+        # starts with a shebang is a file written for the user: never tag it.
+        for b in BASH_BLOCK.finditer(text):
+            src = b.group(1)
+            if src.lstrip().startswith("#!"):
+                continue
+            start = line_of(text, b.start()) + 1
+            for i, cmd in enumerate(src.splitlines()):
+                if SERVER_COMMAND.match(cmd) and not TAG.search(cmd):
+                    fail(f, "ngrok command is missing NGROK_CLIENT_SOURCE", start + i)
+
+
 # --------------------------------------------------------------------------
 # docs checks
 # --------------------------------------------------------------------------
@@ -269,7 +309,7 @@ def main() -> int:
     checks = (
         [check_docs_links, check_error_codes, check_action_types]
         if args.docs
-        else [check_frontmatter, check_references, check_manifests, check_examples]
+        else [check_frontmatter, check_references, check_manifests, check_examples, check_attribution]
     )
     for check in checks:
         before = len(errors)
