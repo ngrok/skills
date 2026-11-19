@@ -1726,9 +1726,9 @@
         "required": false,
         "cel": true,
         "depth": 1,
-        "desc": "Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
+        "desc": "Replacement string. Use `$1`, `$2`, and so on to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
         "values": [],
-        "raw": "\n    Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
+        "raw": "\n    Replacement string. Use `$1`, `$2`, and so on to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
       }
     ],
     "results": [
@@ -1789,9 +1789,9 @@
         "required": false,
         "cel": true,
         "depth": 1,
-        "desc": "Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
+        "desc": "Replacement string. Use `$1`, `$2`, and so on to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
         "values": [],
-        "raw": "\n    Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
+        "raw": "\n    Replacement string. Use `$1`, `$2`, and so on to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
       }
     ],
     "results": [
@@ -1980,9 +1980,9 @@
         "required": false,
         "cel": true,
         "depth": 1,
-        "desc": "Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
+        "desc": "Replacement string. Use `$1`, `$2`, and so on to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted.",
         "values": [],
-        "raw": "\n    Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
+        "raw": "\n    Replacement string. Use `$1`, `$2`, and so on to reference capture groups from the pattern.\n    CEL interpolation is supported for dynamic replacements.\n    If omitted or empty, matched text is deleted.\n  "
       }
     ],
     "results": [

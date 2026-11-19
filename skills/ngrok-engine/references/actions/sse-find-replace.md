@@ -15,7 +15,7 @@ Find and replace text patterns in Server-Sent Events (SSE) streams.
 | `replacements` | array | yes | Array of replacement rules to apply to SSE messages. Rules are applied in order. Minimum `1` replacement required. |
 | `replacements.field` | string | no | The SSE field to apply the replacement to. Valid values are `data` and `retry`. Defaults to `data` if not specified. CEL interpolation is supported. |
 | `replacements.from` | string | yes | Regular expression pattern to match. Supports RE2 syntax. CEL interpolation is supported for dynamic patterns. Accepts CEL interpolation. |
-| `replacements.to` | string | no | Replacement string. Use `$1`, `$2`, etc. to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted. Accepts CEL interpolation. |
+| `replacements.to` | string | no | Replacement string. Use `$1`, `$2`, and so on to reference capture groups from the pattern. CEL interpolation is supported for dynamic replacements. If omitted or empty, matched text is deleted. Accepts CEL interpolation. |
 
 ## Result variables
 
