@@ -45,7 +45,7 @@ With the ngrok MCP server:
 | Is the account at a limit? | `platform_get_enforced_limits`. `platform_get_usage` reports consumption, not caps. |
 | Is the Traffic Policy valid? | `gw_validate_traffic_policy` reports each problem with its line and column. |
 
-Without the server, use the agent's own output (`ngrok http <port> --log stdout`), the local inspector at `http://localhost:4040`, and the [dashboard](https://dashboard.ngrok.com).
+Without the server, use the agent's own output (`NGROK_CLIENT_SOURCE=skills/troubleshoot-ngrok ngrok http <port> --log stdout`), the local inspector at `http://localhost:4040`, and the [dashboard](https://dashboard.ngrok.com).
 
 Then apply the fix from the page, and send the failing request again to confirm.
 
@@ -64,6 +64,10 @@ The docs page has the full fix. These notes are what the page does not say.
 - **Agent exits at once on start.** A credential problem (see `ngrok-setup`) or a config file that does not parse. Run `ngrok config check`.
 - **Traffic Policy has no effect.** The policy is not attached to the endpoint being hit, or an earlier rule ends the chain. Confirm the attachment on the user's surface (see `ngrok-surfaces`). See `ngrok-engine` for rule order.
 - **TLS or certificate errors on an ngrok domain.** First check for an incident at [status.ngrok.com](https://status.ngrok.com). If there is none, something on the user's network is likely intercepting TLS: an ISP filter, a VPN, or endpoint security software on a managed machine. Ask the user to try another network, and to compare the certificate issuer with `openssl s_client -connect <host>:443 -servername <host>`.
+
+## Attribution
+
+Prefix each `ngrok` command you run with `NGROK_CLIENT_SOURCE=skills/troubleshoot-ngrok`, as the examples do. Leave it out of files you write for the user. See "Attribution" in `ngrok-surfaces`.
 
 ## Notes for agents
 

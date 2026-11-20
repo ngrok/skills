@@ -57,7 +57,7 @@ After gathering answers, confirm and get a Y/n before proceeding.
 #### No security (simplest)
 
 ```bash
-ngrok http {PORT} &
+NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok http {PORT} &
 sleep 3
 curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"' | head -1
 ```
@@ -169,7 +169,7 @@ on_http_response:
 After writing the policy file, start ngrok:
 
 ```bash
-ngrok http {PORT} --traffic-policy-file .ngrok/traffic-policy.yml &
+NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok http {PORT} --traffic-policy-file .ngrok/traffic-policy.yml &
 sleep 3
 curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"' | head -1
 ```
@@ -221,7 +221,7 @@ pkill ngrok
 For SSH, RDP, or a database, use `ngrok tcp` instead of `ngrok http`.
 
 ```bash
-ngrok tcp {PORT} &
+NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok tcp {PORT} &
 sleep 3
 curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"' | head -1
 ```
@@ -240,8 +240,8 @@ Common ports: SSH `22`, RDP `3389`, PostgreSQL `5432`, MySQL `3306`.
 ngrok assigns the hostname and port — unlike domains, you cannot choose them:
 
 ```bash
-ngrok api reserved-addrs create --description "SSH for {NAME}" --region us
-ngrok tcp {PORT} --url tcp://{ADDR}
+NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok api reserved-addrs create --description "SSH for {NAME}" --region us
+NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok tcp {PORT} --url tcp://{ADDR}
 ```
 
 Reserved TCP addresses need a paid plan and keep billing until deleted.
@@ -260,7 +260,7 @@ on_tcp_connect:
             - 203.0.113.0/24
 ```
 
-Attach it the same way: `ngrok tcp {PORT} --traffic-policy-file .ngrok/traffic-policy.yml`
+Attach it the same way: `NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok tcp {PORT} --traffic-policy-file .ngrok/traffic-policy.yml`
 
 ## Cloud Endpoints (Advanced)
 
@@ -268,11 +268,11 @@ Only use if the user explicitly needs a URL that persists after the agent stops 
 
 Requires the ngrok MCP server or an API key. If the user manages ngrok as code, add the endpoint there instead. If not, and the MCP server is connected, use it and do not ask for an API key: `gw_reserve_domain` and `gw_create_cloud_endpoint` replace steps 1 and 2, and `delete_resource` replaces step 4. Otherwise the user sets an API key with `ngrok config add-api-key <KEY>` (from https://dashboard.ngrok.com/api-keys). See `ngrok-surfaces` for the order to pick in.
 
-1. Reserve domain: `ngrok api reserved-domains create --domain "{DOMAIN}"`
+1. Reserve domain: `NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok api reserved-domains create --domain "{DOMAIN}"`
 2. Create cloud endpoint with a traffic policy that includes `forward-internal` as the **last** action:
 
 ```bash
-ngrok api endpoints create --url "https://{DOMAIN}" --bindings public --traffic-policy "$(cat .ngrok/traffic-policy.yml)"
+NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok api endpoints create --url "https://{DOMAIN}" --bindings public --traffic-policy "$(cat .ngrok/traffic-policy.yml)"
 ```
 
 The traffic policy must end with:
@@ -283,8 +283,12 @@ The traffic policy must end with:
     url: https://{NAME}.internal
 ```
 
-3. Start the internal agent: `ngrok http {PORT} --url https://{NAME}.internal`
-4. Teardown: `ngrok api endpoints delete {ENDPOINT_ID}`
+3. Start the internal agent: `NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok http {PORT} --url https://{NAME}.internal`
+4. Teardown: `NGROK_CLIENT_SOURCE=skills/expose-localhost ngrok api endpoints delete {ENDPOINT_ID}`
+
+## Attribution
+
+Prefix each `ngrok` command you run with `NGROK_CLIENT_SOURCE=skills/expose-localhost`, as the examples do. Leave it out of files you write for the user. See "Attribution" in `ngrok-surfaces`.
 
 ## Related Skills
 

@@ -91,6 +91,7 @@ the token never lands on disk.
 Start it:
 
 ```bash
+#!/bin/sh
 ngrok start --all --config /etc/ngrok.yml
 ```
 

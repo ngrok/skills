@@ -165,7 +165,7 @@ on_tcp_connect:
 CLI equivalent, which takes the policy as a file and avoids the escaping:
 
 ```bash
-ngrok api endpoints create \
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok api endpoints create \
   --api-key "$NGROK_API_KEY" \
   --type cloud \
   --bindings public \
@@ -182,6 +182,6 @@ For secrets a policy reads at runtime via `${secrets.get('vault', 'name')}`. See
 `ngrok-engine` for the reference syntax and `terraform.md` for the Terraform form.
 
 ```bash
-ngrok api vaults create --name "tenant-secrets"
-ngrok api secrets create --name "webhook-signing-secret" --value "whsec_.." --vault-id "$VAULT_ID"
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok api vaults create --name "tenant-secrets"
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok api secrets create --name "webhook-signing-secret" --value "whsec_.." --vault-id "$VAULT_ID"
 ```

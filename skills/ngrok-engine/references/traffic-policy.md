@@ -53,8 +53,8 @@ secret: "${secrets.get('my-vault', 'stripe-signing-secret')}"
 Create the vault and secret once (shown here via the API; see the surface skills for Terraform/SDK equivalents):
 
 ```bash
-ngrok api vaults create --name "my-vault"
-ngrok api secrets create --name "stripe-signing-secret" --value "whsec_.." --vault-id "$VAULT_ID"
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok api vaults create --name "my-vault"
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok api secrets create --name "stripe-signing-secret" --value "whsec_.." --vault-id "$VAULT_ID"
 ```
 
 Environment-variable interpolation (`${VAR}`) also works for local/dev policies, but Vaults are preferred for anything shared or production.

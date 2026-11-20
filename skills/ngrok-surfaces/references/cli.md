@@ -8,25 +8,25 @@ choice (`ngrok-engine`); this file shows how to attach them from a shell.
 ## One-off agent endpoint
 
 ```bash
-ngrok http 8080
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok http 8080
 ```
 
 Attach a Traffic Policy from a file:
 
 ```bash
-ngrok http 8080 --traffic-policy-file policy.yml
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok http 8080 --traffic-policy-file policy.yml
 ```
 
 Request a reserved domain:
 
 ```bash
-ngrok http 8080 --url https://my-app.ngrok.app
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok http 8080 --url https://my-app.ngrok.app
 ```
 
 Non-HTTP:
 
 ```bash
-ngrok tcp 22
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok tcp 22
 ```
 
 A public TCP endpoint needs a reserved TCP address for a stable URL, and the address
@@ -39,13 +39,13 @@ An internal endpoint has no public URL and is reachable only through a
 internal:
 
 ```bash
-ngrok http 8080 --url https://billing.internal
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok http 8080 --url https://billing.internal
 ```
 
 Internal **TCP** URLs need an explicit port:
 
 ```bash
-ngrok tcp 22 --url tcp://device-1.internal:22
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok tcp 22 --url tcp://device-1.internal:22
 ```
 
 ## `ngrok.yml` (declarative agent config)
@@ -72,8 +72,8 @@ endpoints:
 Start them:
 
 ```bash
-ngrok start --all
-ngrok start webhook-receiver
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok start --all
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok start webhook-receiver
 ```
 
 Prefer `NGROK_AUTHTOKEN` in the environment over the `agent.authtoken` key whenever
@@ -101,15 +101,15 @@ Use this path when the ngrok MCP server is not connected. If it is connected, cr
 instead of an escaped JSON string:
 
 ```bash
-ngrok api endpoints create \
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok api endpoints create \
   --api-key "$NGROK_API_KEY" \
   --type cloud \
   --bindings public \
   --url "https://api.example.com" \
   --traffic-policy-file policy.yml
 
-ngrok api vaults create --name "webhooks"
-ngrok api secrets create --name "stripe-signing-secret" --value "whsec_.." --vault-id "$VAULT_ID"
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok api vaults create --name "webhooks"
+NGROK_CLIENT_SOURCE=skills/{SKILL} ngrok api secrets create --name "stripe-signing-secret" --value "whsec_.." --vault-id "$VAULT_ID"
 ```
 
 Note the credential switch: `ngrok api` needs an **API key**, not the agent

@@ -72,6 +72,14 @@ When you use the MCP server:
 
 This order is for setup that you do for the user. Code that creates resources at run time, such as a controlplane (see `provision-sandbox-access`), always uses an API key.
 
+## Attribution
+
+Each `ngrok` command that you run starts with `NGROK_CLIENT_SOURCE=skills/{SKILL}`, as the examples in the references do. Replace `{SKILL}` with the task skill you are running, for example `skills/receive-webhooks`, or with `ngrok-surfaces` if no task skill sent you here.
+
+- The tag tells ngrok which skill started the endpoint or made the API call. It changes nothing else.
+- Always include it. The ngrok agent does not send it when `DO_NOT_TRACK` is set.
+- Leave it out of files that you write for the user, such as scripts, Dockerfiles, CI jobs, or service configs.
+
 ## Notes for agents
 
 - Run the commands yourself when you have a shell; hand back the result, not instructions.
