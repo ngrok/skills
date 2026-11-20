@@ -3,14 +3,16 @@
 
     python3 scripts/validate.py          # offline checks (every PR)
     python3 scripts/validate.py --docs   # also check against ngrok.com/docs
+    python3 scripts/validate.py --fix    # fix attribution tags, then check
 
 Offline checks:
   - frontmatter: `name` matches the folder, required fields are present
   - references: every `references/...` or `<skill>/...` path resolves
   - manifests: plugin JSON parses, names and repo URLs agree
   - examples: YAML blocks parse, and use no deprecated agent config syntax
-  - attribution: NGROK_CLIENT_SOURCE tags name their own skill and cover every
-    ngrok command in a file that uses them
+  - attribution: every ngrok command in a shell block carries an
+    NGROK_CLIENT_SOURCE tag that names its own skill, except in blocks that
+    go into the user's files
 
 Docs checks (--docs):
   - every ngrok.com/docs link returns 200
@@ -178,41 +180,86 @@ def check_examples() -> None:
 
 
 # Skill attribution tag on ngrok commands the agent runs (see README "Telemetry").
+# Agents copy examples word for word, so the tag lives in every example.
+#
+#   - Every ngrok command in a shell block, in every skill file, carries the tag.
+#   - A block that goes into the user's files (an entrypoint, a startup script)
+#     never carries it. Such a block starts with a shebang.
+#   - Put a runnable ngrok command in a shell block, not inline code, so this
+#     check can see it.
 TAG = re.compile(r"NGROK_CLIENT_SOURCE=([^\s`]+)")
+TAG_ASSIGN = re.compile(r"NGROK_CLIENT_SOURCE=[^\s`]+\s+")
 TAG_VALUE = re.compile(r"^[a-z0-9/._-]{1,64}$")
 # Reference skills don't know which task skill loaded them; the agent fills it in.
 TAG_PLACEHOLDER = "skills/{SKILL}"
 REFERENCE_SKILLS = {"ngrok-surfaces", "ngrok-engine"}
 BASH_BLOCK = re.compile(r"^[ \t]*```(?:bash|sh|shell)\n(.*?)^[ \t]*```", re.M | re.S)
-SERVER_COMMAND = re.compile(r"^\s*(?:\S+=\S+\s+)*ngrok (?:http|tcp|tls|start|api)\b")
+# Group 1 is the text before `ngrok`, where --fix inserts the tag.
+SERVER_COMMAND = re.compile(r"^(\s*(?:\S+=\S+\s+)*)ngrok (?:http|tcp|tls|start|api)\b")
+
+
+def expected_tag(skill: str) -> str:
+    return TAG_PLACEHOLDER if skill in REFERENCE_SKILLS else f"skills/{skill}"
+
+
+def is_user_file(src: str) -> bool:
+    return src.lstrip().startswith("#!")
+
+
+def fix_attribution() -> None:
+    """Add missing tags, correct wrong ones, and remove tags from user files."""
+    for f in markdown_files():
+        text = f.read_text()
+        skill = f.relative_to(SKILLS).parts[0]
+        want = expected_tag(skill)
+        valid = {want, f"skills/{skill}"}
+        new = TAG.sub(lambda m: m.group(0) if m.group(1) in valid else f"NGROK_CLIENT_SOURCE={want}", text)
+
+        def fix_block(b: re.Match) -> str:
+            user_file = is_user_file(b.group(1))
+            lines = b.group(1).splitlines(keepends=True)
+            for i, line in enumerate(lines):
+                if user_file:
+                    lines[i] = TAG_ASSIGN.sub("", line)
+                elif (m := SERVER_COMMAND.match(line)) and not TAG.search(line):
+                    lines[i] = f"{m.group(1)}NGROK_CLIENT_SOURCE={want} {line[m.end(1):]}"
+            head = b.string[b.start() : b.start(1)]
+            tail = b.string[b.end(1) : b.end()]
+            return head + "".join(lines) + tail
+
+        new = BASH_BLOCK.sub(fix_block, new)
+        if new != text:
+            f.write_text(new)
+            print(f"fixed {f.relative_to(ROOT)}")
 
 
 def check_attribution() -> None:
     for f in markdown_files():
         text = f.read_text()
         skill = f.relative_to(SKILLS).parts[0]
-        tags = list(TAG.finditer(text))
-        for m in tags:
+        want = expected_tag(skill)
+        for m in TAG.finditer(text):
             value, line = m.group(1), line_of(text, m.start())
             if value == TAG_PLACEHOLDER:
                 if skill not in REFERENCE_SKILLS:
-                    fail(f, f"use skills/{skill}, not {TAG_PLACEHOLDER}, in a task skill", line)
+                    fail(f, f"use skills/{skill}, not {TAG_PLACEHOLDER}, in a task skill (run with --fix)", line)
             elif value != f"skills/{skill}":
-                fail(f, f"attribution tag {value!r} does not name this skill (skills/{skill})", line)
+                fail(f, f"attribution tag {value!r} does not name this skill ({want}) (run with --fix)", line)
             elif not TAG_VALUE.match(value):
                 fail(f, f"attribution tag {value!r} is not lowercase [a-z0-9/._-], 64 chars max", line)
-        if not tags:
-            continue
-        # A file that tags its commands must tag all of them. A block that
-        # starts with a shebang is a file written for the user: never tag it.
         for b in BASH_BLOCK.finditer(text):
-            src = b.group(1)
-            if src.lstrip().startswith("#!"):
-                continue
+            user_file = is_user_file(b.group(1))
             start = line_of(text, b.start()) + 1
-            for i, cmd in enumerate(src.splitlines()):
-                if SERVER_COMMAND.match(cmd) and not TAG.search(cmd):
-                    fail(f, "ngrok command is missing NGROK_CLIENT_SOURCE", start + i)
+            for i, cmd in enumerate(b.group(1).splitlines()):
+                if user_file and TAG.search(cmd):
+                    fail(f, "remove NGROK_CLIENT_SOURCE: this block goes into the user's files (run with --fix)", start + i)
+                elif not user_file and SERVER_COMMAND.match(cmd) and not TAG.search(cmd):
+                    fail(
+                        f,
+                        f"ngrok command is missing NGROK_CLIENT_SOURCE={want} (run with --fix). "
+                        "If this block goes into the user's files, start it with a shebang",
+                        start + i,
+                    )
 
 
 # --------------------------------------------------------------------------
@@ -304,7 +351,11 @@ def check_action_types() -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--docs", action="store_true", help="check against ngrok.com/docs")
+    ap.add_argument("--fix", action="store_true", help="fix attribution tags in place, then check")
     args = ap.parse_args()
+
+    if args.fix:
+        fix_attribution()
 
     checks = (
         [check_docs_links, check_error_codes, check_action_types]

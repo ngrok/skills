@@ -108,6 +108,7 @@ endpoints:
 ```
 
 ```bash
+#!/bin/sh
 ngrok start --all --config /path/to/ngrok.yml
 ```
 
