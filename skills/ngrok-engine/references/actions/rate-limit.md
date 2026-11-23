@@ -31,7 +31,7 @@ The duration in which events may be limited based on the current capacity. Must 
 
 **`bucket_key`**
 
-The elements of this collection define the unique key of a request to track the rate at which the capacity is being met. Each bucket key is a CEL expression which includes all valid Traffic Policy variables and macros. Up to ten bucket keys can be specified. For multiple buckets, the action will rate limit by each unique combination of buckets.
+The elements of this collection define the unique key of a request to track the rate at which the capacity is being met. Each bucket key is a CEL expression which includes all valid Traffic Policy variables and macros. Up to ten bucket keys can be specified. For multiple buckets, the action rate limits by each unique combination of buckets.
 
 ## Result variables
 
