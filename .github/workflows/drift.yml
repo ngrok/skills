@@ -22,7 +22,7 @@ jobs:
       pull-requests: write   # open or update the PR
       actions: write         # dispatch ci.yml on the PR branch
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -36,7 +36,7 @@ jobs:
       # approve pull requests" must stay on for this step to work.
       - name: Open a PR if anything changed
         id: pr
-        uses: peter-evans/create-pull-request@15733dbdfeedb4f7fdb73d13c6f5ac83b710fab8 # v8.1.2
+        uses: peter-evans/create-pull-request@v8.1.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: bot/action-catalog
@@ -66,11 +66,11 @@ jobs:
     # code. A failure here means main is out of date with the docs.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@v10.3.3
 
       - name: Check docs links, action types, and error codes
         run: uv run --with pyyaml==6.0.3 scripts/validate.py --docs
