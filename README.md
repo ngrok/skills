@@ -4,6 +4,10 @@ A collection of skills for AI coding agents, covering how to expose local servic
 
 Skills follow the [Agent Skills](https://agentskills.io/) format, so this repo works as a standalone skill pack and as a plugin for Claude Code, Cursor, ChatGPT, and Codex.
 
+## Connect your agent to ngrok's MCP server
+
+Follow the [ngrok MCP quickstart](https://ngrok.com/docs/mcp-server) to connect an AI client and inspect or manage your account. Once connected, the skills can check live endpoints, agents, and traffic instead of asking you. The Claude Code, Cursor, and Codex plugin packages include MCP connection configuration; a standalone skills install does not. Sign in through the client after installation. The ngrok CLI or an SDK starts tunnels from your machine.
+
 ## Installation
 
 Any [Agent Skills](https://agentskills.io/)-compatible agent:
@@ -38,7 +42,7 @@ Or install as a plugin:
 | `run-mcp-gateway`          | Expose an MCP server under development so Claude, OpenAI, or another provider can connect to it, each with its own credential         | "Let Claude connect to my local MCP server"                                                          |
 | `provision-sandbox-access` | Give every sandbox, container, customer device, or tenant its own isolated endpoint, provisioned programmatically from a controlplane | "Each sandbox needs its own SSH access", "One endpoint per customer"                                 |
 | `troubleshoot-ngrok`       | Diagnose any ngrok error from its docs page and your account's live state                                                             | "What does ERR_NGROK_3200 mean?", "Works on localhost, 400 through the ngrok URL"                    |
-| `ngrok-setup`              | Get authenticated and pointed at the right surface — CLI, SDK, API, or infrastructure-as-code                                         | "Set up ngrok", "ngrok says I'm not authenticated"                                                   |
+| `ngrok-setup`              | Set up and authenticate ngrok on the right surface: ngrok CLI, SDK, API, infrastructure as code, or hosted MCP                        | "Set up ngrok", "Set up ngrok MCP", "ngrok says I'm not authenticated"                               |
 
 ### Supporting References
 
@@ -48,10 +52,6 @@ Two skills are reference material rather than tasks. The skills above load them 
 | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ngrok-engine`   | Endpoint types (agent, cloud, internal), HTTP vs TCP, and Traffic Policy — the rule language, plus a reference for all 26 traffic policy actions                |
 | `ngrok-surfaces` | How to apply configuration on each surface: agent CLI and `ngrok.yml`, the Go/JavaScript/Python/Rust SDKs, the REST API, Terraform, and the Kubernetes Operator |
-
-## ngrok MCP server
-
-When the ngrok MCP server is connected, the skills use it to check your account's live state, such as endpoints, agents, and traffic, instead of asking you. The plugin installs include the server. To sign in or set it up another way, see the [ngrok MCP server docs](https://ngrok.com/docs/mcp-server).
 
 ## Usage
 
