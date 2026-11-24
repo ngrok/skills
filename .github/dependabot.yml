@@ -1,7 +1,7 @@
 version: 2
 updates:
-  # Keeps the SHA-pinned actions in .github/workflows current. Dependabot
-  # updates the SHA and the version comment together.
+  # Keeps the actions in .github/workflows current. Dependabot updates the
+  # tag in each workflow and regenerates .github/workflows/actions.lock.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
