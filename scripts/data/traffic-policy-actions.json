@@ -621,7 +621,7 @@
         "depth": 1,
         "desc": "List of allowed issuers. Minimum `1`.",
         "values": [],
-        "raw": "\n      List of allowed issuers. Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
+        "raw": "\n      List of allowed issuers.\n      Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
       },
       {
         "name": "issuer.allow_list[*].value",
@@ -629,9 +629,9 @@
         "required": true,
         "cel": true,
         "depth": 2,
-        "desc": "Issuer URL. This can be found in the `iss` claim after decoding the JWT or from the `/.well-known/openid-configuration` endpoint in your Identity Provider.",
+        "desc": "Issuer URL. You can find this in the `iss` claim after decoding the JWT or from the `/.well-known/openid-configuration` endpoint in your Identity Provider.",
         "values": [],
-        "raw": "\n          Issuer URL. This can be found in the <code>iss</code> claim after decoding the JWT or from the <code>/.well-known/openid-configuration</code> endpoint in your Identity Provider.\n        "
+        "raw": "\n          Issuer URL.\n          You can find this in the <code>iss</code> claim after decoding the JWT or from the <code>/.well-known/openid-configuration</code> endpoint in your Identity Provider.\n        "
       },
       {
         "name": "audience",
@@ -651,7 +651,7 @@
         "depth": 1,
         "desc": "List of allowed audiences. Minimum `1`.",
         "values": [],
-        "raw": "\n      List of allowed audiences. Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
+        "raw": "\n      List of allowed audiences.\n      Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
       },
       {
         "name": "audience.allow_list[*].value",
@@ -659,9 +659,9 @@
         "required": false,
         "cel": false,
         "depth": 2,
-        "desc": "Audience claim value. This can be found in the `aud` claim after decoding the JWT or from the request used to create the token in the first place.",
+        "desc": "Audience claim value. You can find this in the `aud` claim after decoding the JWT or from the request used to create the token in the first place.",
         "values": [],
-        "raw": "\n          Audience claim value. This can be found in the <code>aud</code> claim after decoding the JWT or from the request used to create the token in the first place.\n        "
+        "raw": "\n          Audience claim value.\n          You can find this in the <code>aud</code> claim after decoding the JWT or from the request used to create the token in the first place.\n        "
       },
       {
         "name": "http",
@@ -681,7 +681,7 @@
         "depth": 1,
         "desc": "List of tokens to validate. Minimum `1`.",
         "values": [],
-        "raw": "\n      List of tokens to validate. Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
+        "raw": "\n      List of tokens to validate.\n      Minimum `1`.\n\n      <Expandable label=\"child properties\">\n        \n      </Expandable>\n    "
       },
       {
         "name": "http.tokens[*].type",
@@ -706,12 +706,12 @@
         "required": true,
         "cel": false,
         "depth": 2,
-        "desc": "Location in the request to expect the JWT. When choosing `header`, the `content-type` header must be set to either `application/json` or `application/x-www-form-urlencoded`. When choosing `body`, the method must be `POST`, `PUT`, or `PATCH` Including a token as a URL query parameter is not supported.",
+        "desc": "Location in the request to expect the JWT. When choosing `body`, the `content-type` header must be set to either `application/json` or `application/x-www-form-urlencoded`. When choosing `body`, the method must be `POST`, `PUT`, or `PATCH`. Including a token as a URL query parameter isn't supported.",
         "values": [
           "`header`",
           "`body`"
         ],
-        "raw": "\n          Location in the request to expect the JWT.\n\n          <ConfigEnum>\n             \n             \n          </ConfigEnum>\n\n          When choosing `header`, the <code>content-type</code> header must be set to either <code>application/json</code> or <code>application/x-www-form-urlencoded</code>.\n          \n          When choosing <code>body</code>, the method must be <code>POST</code>, <code>PUT</code>, or <code>PATCH</code>\n          \n          Including a token as a URL query parameter is not supported.\n        "
+        "raw": "\n          Location in the request to expect the JWT.\n\n          <ConfigEnum>\n             \n             \n          </ConfigEnum>\n\n          When choosing `body`, the <code>content-type</code> header must be set to either <code>application/json</code> or <code>application/x-www-form-urlencoded</code>.\n          \n          When choosing <code>body</code>, the method must be <code>POST</code>, <code>PUT</code>, or <code>PATCH</code>.\n          \n          Including a token as a URL query parameter isn't supported.\n        "
       },
       {
         "name": "http.tokens[*].name",
@@ -719,9 +719,9 @@
         "required": true,
         "cel": true,
         "depth": 2,
-        "desc": "Name of the header or body field where the JWT is expected (Example: `\"Authorization\"`). This is not case sensitive.",
+        "desc": "Name of the header or body field where the JWT is expected (for example, `\"Authorization\"`). This isn't case sensitive.",
         "values": [],
-        "raw": "\n          Name of the header or body field where the JWT is expected (Example: <code>\"Authorization\"</code>). This is not case sensitive.\n        "
+        "raw": "\n          Name of the header or body field where the JWT is expected (for example, <code>\"Authorization\"</code>).\n          This isn't case sensitive.\n        "
       },
       {
         "name": "http.tokens[*].prefix",
@@ -729,9 +729,9 @@
         "required": false,
         "cel": true,
         "depth": 2,
-        "desc": "Any prefix to strip from the header or body field before parsing the JWT (Example: `\"Bearer \"`).",
+        "desc": "Any prefix to strip from the header or body field before parsing the JWT (for example, `\"Bearer \"`).",
         "values": [],
-        "raw": "\n          Any prefix to strip from the header or body field before parsing the JWT (Example: <code>\"Bearer \"</code>).\n        "
+        "raw": "\n          Any prefix to strip from the header or body field before parsing the JWT (for example, <code>\"Bearer \"</code>).\n        "
       },
       {
         "name": "jws",
@@ -749,9 +749,9 @@
         "required": true,
         "cel": false,
         "depth": 1,
-        "desc": "List of allowed signing algorithms. The value `none` is not supported here because it is insecure. Minimum `1`.",
+        "desc": "List of allowed signing algorithms. The value `none` isn't supported here because it's insecure. Minimum `1`.",
         "values": [],
-        "raw": "\n      List of allowed signing algorithms. The value <code>none</code> is not supported here because it is insecure. Minimum `1`.\n    "
+        "raw": "\n      List of allowed signing algorithms.\n      The value <code>none</code> isn't supported here because it's insecure.\n      Minimum `1`.\n    "
       },
       {
         "name": "jws.keys",
@@ -799,9 +799,9 @@
         "required": true,
         "cel": true,
         "depth": 3,
-        "desc": "List of URLs which serve the possible signing keys in JWKS format. These URLs are cached and refreshed roughly every 15 minutes.",
+        "desc": "List of URLs that serve the possible signing keys in JWKS format. ngrok caches these URLs and refreshes them roughly every 15 minutes, or less often when the JWKS response sets a longer `Cache-Control: max-age` or `Expires`.",
         "values": [],
-        "raw": "\n              List of URLs which serve the possible signing keys in JWKS format. These URLs are cached and refreshed roughly every 15 minutes.\n            "
+        "raw": "\n              List of URLs that serve the possible signing keys in JWKS format.\n              ngrok caches these URLs and refreshes them roughly every 15 minutes, or less often when the JWKS response sets a longer `Cache-Control: max-age` or `Expires`.\n            "
       }
     ],
     "results": [
@@ -929,7 +929,7 @@
         "depth": 0,
         "desc": "Your OAuth app's client ID. Leave this empty if you want to use ngrok's managed application.",
         "values": [],
-        "raw": "\n\tYour OAuth app's client ID.\n\t<Note>\n\t\tLeave this empty if you want to use ngrok's managed application.\n\t</Note>\n"
+        "raw": "\n\tYour OAuth app's client ID.\n\t<Note>\n\tLeave this empty if you want to use ngrok's managed application.\n\t</Note>\n"
       },
       {
         "name": "client_secret",
@@ -939,7 +939,7 @@
         "depth": 0,
         "desc": "Your OAuth app's client secret. Leave this empty if you want to use a managed application.",
         "values": [],
-        "raw": "\n\tYour OAuth app's client secret.\n\t<Note>\n\t\tLeave this empty if you want to use a managed application.\n\t</Note>\n"
+        "raw": "\n\tYour OAuth app's client secret.\n\t<Note>\n\tLeave this empty if you want to use a managed application.\n\t</Note>\n"
       },
       {
         "name": "scopes",
@@ -1540,13 +1540,13 @@
         "required": true,
         "cel": false,
         "depth": 0,
-        "desc": "The elements of this collection define the unique key of a request to track the rate at which the capacity is being met. Each bucket key is a CEL expression which includes all valid Traffic Policy variables and macros. Up to ten bucket keys can be specified. For multiple buckets, the action will rate limit by each unique combination of buckets.",
+        "desc": "The elements of this collection define the unique key of a request to track the rate at which the capacity is being met. Each bucket key is a CEL expression which includes all valid Traffic Policy variables and macros. Up to ten bucket keys can be specified. For multiple buckets, the action rate limits by each unique combination of buckets.",
         "values": [
           "`req.host` - The Host of the request.",
           "`conn.client_ip` - The client IP address.",
           "`getReqHeader('X-Example-Header-Name')` - The value for the specified header key, if it exists."
         ],
-        "raw": "\n        <p>The elements of this collection define the unique key of a request to track the rate at which the capacity is being met.</p>\n        <p>Each bucket key is a CEL expression which includes all valid Traffic Policy [variables](/gateway/traffic-policy/variables/) and [macros](/gateway/traffic-policy/macros/).</p>\n        <ConfigEnum label=\"Sample buckets\">\n             \n             \n             \n        </ConfigEnum>\n        <p>Up to ten bucket keys can be specified. For multiple buckets, the action will rate limit by each unique combination of buckets.</p>\n    "
+        "raw": "\n        <p>The elements of this collection define the unique key of a request to track the rate at which the capacity is being met.</p>\n        <p>Each bucket key is a CEL expression which includes all valid Traffic Policy [variables](/gateway/traffic-policy/variables/) and [macros](/gateway/traffic-policy/macros/).</p>\n        <ConfigEnum label=\"Sample buckets\">\n             \n             \n             \n        </ConfigEnum>\n        <p>Up to ten bucket keys can be specified. For multiple buckets, the action rate limits by each unique combination of buckets.</p>\n    "
       }
     ],
     "results": [
@@ -1920,7 +1920,7 @@
         "depth": 0,
         "desc": "List of maps that have a key of string and a value of any valid CEL type Each map must be of exactly size `1`, and represents one variable where the key is the name of the variable: ```yaml vars: - variable_a: value - variable_b: value ```",
         "values": [],
-        "raw": "\n  List of maps that have a key of string and a value of any valid CEL type\n\n  <Note>\n    Each map must be of exactly size `1`, and represents one variable where the\n    key is the name of the variable:\n    ```yaml\n    vars:\n      - variable_a: value\n      - variable_b: value\n    ```\n  </Note>\n"
+        "raw": "\n  List of maps that have a key of string and a value of any valid CEL type\n\n  <Note>\n  Each map must be of exactly size `1`, and represents one variable where the key is the name of the variable:\n  ```yaml\n  vars:\n    - variable_a: value\n    - variable_b: value\n  ```\n  </Note>\n"
       }
     ],
     "results": [],
